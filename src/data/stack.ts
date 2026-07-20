@@ -46,10 +46,28 @@ export interface StackTool {
   concepts: StackConcept[]
 }
 
-export const PRIORITY_META: Record<Priority, { label: string; desc: string }> = {
-  5: { label: '核心必读', desc: '构成现代 Agent Harness 的骨架，建议深入源码级理解' },
-  4: { label: '重点掌握', desc: '生产级 Agent 系统不可或缺的能力组件' },
-  3: { label: '了解参考', desc: '作为产品形态与协作范式的参考实现' },
+export const PRIORITY_META: Record<
+  Priority,
+  { label: string; labelEn: string; desc: string; descEn: string }
+> = {
+  5: {
+    label: '核心必读',
+    labelEn: 'Must-read',
+    desc: '构成现代 Agent Harness 的骨架，建议深入源码级理解',
+    descEn: 'Skeleton of a modern Agent Harness — worth deep, source-level study',
+  },
+  4: {
+    label: '重点掌握',
+    labelEn: 'Core',
+    desc: '生产级 Agent 系统不可或缺的能力组件',
+    descEn: 'Essential building blocks for production Agent systems',
+  },
+  3: {
+    label: '了解参考',
+    labelEn: 'Reference',
+    desc: '作为产品形态与协作范式的参考实现',
+    descEn: 'Reference implementations for product shapes and collaboration patterns',
+  },
 }
 
 export const LAYERS: StackLayer[] = [
@@ -439,14 +457,14 @@ export function toolsByPriority(priority: Priority): StackTool[] {
 }
 
 /** 站点锚点定义（Navbar / StackMap / Footer 共用） */
-export const NAV_ITEMS: { id: string; label: string }[] = [
-  { id: 'top', label: '首页' },
-  { id: 'map', label: '架构地图' },
-  { id: 'runtime', label: '运行时' },
-  { id: 'observability', label: '可观测' },
-  { id: 'memory', label: '记忆与评估' },
-  { id: 'infra', label: '基础设施' },
-  { id: 'platform', label: '平台层' },
-  { id: 'path', label: '学习路径' },
-  { id: 'table', label: '全景对照表' },
+export const NAV_ITEMS: { id: string; label: string; labelEn: string }[] = [
+  { id: 'top', label: '首页', labelEn: 'Home' },
+  { id: 'map', label: '架构地图', labelEn: 'Stack Map' },
+  { id: 'runtime', label: '运行时', labelEn: 'Runtime' },
+  { id: 'observability', label: '可观测', labelEn: 'Observability' },
+  { id: 'memory', label: '记忆与评估', labelEn: 'Memory & Eval' },
+  { id: 'infra', label: '基础设施', labelEn: 'Infrastructure' },
+  { id: 'platform', label: '平台层', labelEn: 'Platform' },
+  { id: 'path', label: '学习路径', labelEn: 'Learning Path' },
+  { id: 'table', label: '全景对照表', labelEn: 'Comparison' },
 ]

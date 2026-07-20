@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 
 export type Lang = 'zh' | 'en'
 
@@ -23,8 +23,16 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const setLang = (l: Lang) => {
     setLangState(l)
     window.localStorage.setItem(STORAGE_KEY, l)
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = l === 'zh' ? 'zh-CN' : 'en'
+    }
   }
   const toggle = () => setLang(lang === 'zh' ? 'en' : 'zh')
+
+  useEffect(() => {
+    document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en'
+  }, [lang])
+
   return <LangContext.Provider value={{ lang, setLang, toggle }}>{children}</LangContext.Provider>
 }
 

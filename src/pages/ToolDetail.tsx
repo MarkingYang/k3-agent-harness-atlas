@@ -293,14 +293,14 @@ export default function ToolDetail() {
 
       <main className="mx-auto w-full max-w-6xl flex-1 px-5 pb-20 pt-10 sm:px-8">
         {/* 面包屑 */}
-        <nav aria-label="面包屑" className="flex flex-wrap items-center gap-1.5 text-xs text-stone-500">
+        <nav aria-label="breadcrumb" className="flex flex-wrap items-center gap-1.5 text-xs text-stone-500">
           <a href="/" className="inline-flex items-center gap-1 rounded-md px-1 py-0.5 transition-colors hover:text-stone-800">
             <Home className="h-3.5 w-3.5" />
-            首页
+            {lang === 'zh' ? '首页' : 'Home'}
           </a>
           <ChevronRight className="h-3 w-3 text-stone-300" />
           <a href={`/#${anchor}`} className="rounded-md px-1 py-0.5 transition-colors hover:text-stone-800">
-            {layer.zhName}
+            {lang === 'zh' ? layer.zhName : layer.name}
           </a>
           <ChevronRight className="h-3 w-3 text-stone-300" />
           <span className="px-1 py-0.5 font-medium text-stone-700">{tool.name}</span>
@@ -835,7 +835,7 @@ export default function ToolDetail() {
             {/* 同层相关项目 */}
             {siblings.length > 0 && (
               <section id="sec-related" className="mt-14 scroll-mt-24">
-                <DeepSectionTitle title={`${L.related} · ${layer.zhName}`} accent={layer.accent} />
+                <DeepSectionTitle title={`${L.related} · ${lang === 'zh' ? layer.zhName : layer.name}`} accent={layer.accent} />
                 <div className="mt-5 flex flex-wrap gap-2">
                   {siblings.map((s) => (
                     <Link

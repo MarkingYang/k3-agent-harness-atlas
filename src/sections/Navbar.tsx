@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router'
 import { Blocks, Github, Languages, Menu } from 'lucide-react'
 import { NAV_ITEMS } from '@/data/stack'
 import { useLanguage, type Lang } from '@/hooks/use-language'
+import { UI, navLabel } from '@/i18n/ui'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
@@ -21,7 +22,7 @@ const LANG_OPTIONS: { value: Lang; label: string }[] = [
 
 /** 中 / EN 胶囊分段切换控件 */
 function LangSwitch() {
-  const { lang, toggle } = useLanguage()
+  const { lang, setLang } = useLanguage()
 
   return (
     <div className="flex items-center gap-1.5" role="group" aria-label="语言切换 / Language">
@@ -32,9 +33,7 @@ function LangSwitch() {
             key={opt.value}
             type="button"
             aria-pressed={lang === opt.value}
-            onClick={() => {
-              if (lang !== opt.value) toggle()
-            }}
+            onClick={() => setLang(opt.value)}
             className={cn(
               'rounded-full px-2.5 py-1 text-xs font-medium transition-colors',
               lang === opt.value
@@ -64,6 +63,9 @@ export default function Navbar() {
   const navigate = useNavigate()
   const { pathname } = useLocation()
 
+  const { lang } = useLanguage()
+  const u = UI[lang]
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24)
     onScroll()
@@ -91,7 +93,7 @@ export default function Navbar() {
         <Blocks className="h-5 w-5" />
       </span>
       <span className="text-base font-semibold tracking-tight text-stone-800">
-        Agent Harness 全景指南
+        {u.siteName}
       </span>
     </a>
   )
@@ -141,12 +143,12 @@ export default function Navbar() {
             </SheetTrigger>
             <SheetContent side="right" className="w-72 bg-[#FFFDF8]">
               <SheetHeader>
-                <SheetTitle className="text-left text-stone-800">页面导航</SheetTitle>
+                <SheetTitle className="text-left text-stone-800">{u.navPage}</SheetTitle>
                 <SheetDescription className="text-left">
-                  跳转到指南的各个分区
+                  {u.navPageDesc}
                 </SheetDescription>
               </SheetHeader>
-              <nav className="mt-6 flex flex-col gap-1" aria-label="页面导航（移动端）">
+              <nav className="mt-6 flex flex-col gap-1" aria-label={u.navPage}>
                 {NAV_ITEMS.map((item) => (
                   <a
                     key={item.id}
@@ -154,7 +156,7 @@ export default function Navbar() {
                     onClick={goAnchor(item.id)}
                     className="rounded-xl px-4 py-3 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-100 hover:text-stone-900"
                   >
-                    {item.label}
+                    {navLabel(item, lang)}
                   </a>
                 ))}
               </nav>
