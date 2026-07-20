@@ -21,7 +21,7 @@
     "type": "git",
     "url": "https://github.com/MarkingYang/k3-agent-harness-atlas"
   },
-  "homepage": "https://MarkingYang.github.io/k3-agent-harness-atlas/",
+  "homepage": "https://www.ainoteatlas.com/",
   "scripts": {
     "dev": "vite",
     "restart": "bash restart-dev.sh",

@@ -4,7 +4,7 @@
 
 交互式学习站点：用分层地图与 16 个开源项目，讲清现代 Agent 系统里 **Harness** 这一层在做什么。
 
-**在线访问：** https://MarkingYang.github.io/k3-agent-harness-atlas/
+**在线访问：** https://www.ainoteatlas.com/
 
 ---
 
@@ -20,7 +20,7 @@
 
 ## 怎么用这个站
 
-1. 打开 [在线站点](https://MarkingYang.github.io/k3-agent-harness-atlas/)，从首页 **架构地图**（`#map`）看九层全貌。  
+1. 打开 [在线站点](https://www.ainoteatlas.com/)，从首页 **架构地图**（`#map`）看九层全貌。  
 2. 按分区浏览：运行时 → 可观测 → 记忆与评估 → 基础设施 → 平台。  
 3. 打开 **学习路径**（`#path`），按 ★ 优先级选项目，再点进详情页。  
 4. 详情页（`/tool/:id`）可看 Star 趋势、版本史、架构 / 数据流 / 技术版图 / 时序四类图，以及机制与取舍说明。  

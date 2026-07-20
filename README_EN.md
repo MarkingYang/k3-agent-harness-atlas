@@ -4,7 +4,7 @@
 
 An interactive learning site: a layered map plus 16 open-source projects that explain what an **Agent Harness** is in modern Agent systems.
 
-**Live site:** https://MarkingYang.github.io/k3-agent-harness-atlas/
+**Live site:** https://www.ainoteatlas.com/
 
 ---
 
@@ -20,7 +20,7 @@ This site splits those capabilities into nine layers and deep-dives representati
 
 ## How to use the site
 
-1. Open the [live site](https://MarkingYang.github.io/k3-agent-harness-atlas/) and start from the **stack map** (`#map`).  
+1. Open the [live site](https://www.ainoteatlas.com/) and start from the **stack map** (`#map`).  
 2. Browse by section: runtime → observability → memory & eval → infrastructure → platform.  
 3. Open the **learning path** (`#path`), pick projects by ★ priority, then open a detail page.  
 4. Detail pages (`/tool/:id`) show star trends, versions, four diagram types, and design notes.  
