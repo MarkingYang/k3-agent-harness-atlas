@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Brand tile: warm amber, matches site primary -->
+  <rect width="32" height="32" rx="8" fill="#9A3412"/>
+  <rect x="1" y="1" width="30" height="30" rx="7" fill="#B45309"/>
+
+  <!-- Linked harness nodes (atlas / nervous system) -->
+  <g stroke="#FFFBEB" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="10" cy="11" r="2.4" fill="#FDBA74"/>
+    <circle cx="22" cy="11" r="2.4" fill="#FDBA74"/>
+    <circle cx="16" cy="21" r="2.4" fill="#FDBA74"/>
+    <path d="M12.2 11.8 13.8 13.6M19.8 11.8 18.2 13.6M16 15.2v3.2"/>
+    <path d="M12.6 18.6c1.1 1.2 2.2 1.8 3.4 1.8s2.3-.6 3.4-1.8" fill="none"/>
+  </g>
+</svg>
