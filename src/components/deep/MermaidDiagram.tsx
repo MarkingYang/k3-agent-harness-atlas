@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import mermaid from 'mermaid'
 import { AlertTriangle, Check, Pencil, RotateCcw, X, ZoomIn, ZoomOut } from 'lucide-react'
+import { useTheme } from '@/hooks/use-theme'
 
 mermaid.initialize({
   startOnLoad: false,
@@ -26,8 +27,18 @@ const TIER_EPSILON = 0.005
 /** 拖拽进入平移的位移阈值（px），避免点击/轻微触碰被误判为拖动 */
 const PAN_THRESHOLD = 4
 
+type DiagramMode = 'light' | 'dark'
+
 /** 每次渲染前拼接的 %%init%% 暖色主题指令（导出供 scripts/verify-label-render.ts 复用，避免漂移） */
-export function withTheme(source: string, accent: string, softBg: string): string {
+export function withTheme(
+  source: string,
+  accent: string,
+  softBg: string,
+  mode: DiagramMode = 'light',
+): string {
+  const dark = mode === 'dark'
+  const ink = dark ? '#E8E0D4' : '#44403C'
+  const inkSoft = dark ? '#C4B8A8' : '#57534E'
   const init = {
     theme: 'base',
     themeVariables: {
@@ -36,29 +47,29 @@ export function withTheme(source: string, accent: string, softBg: string): strin
       primaryBorderColor: accent,
       primaryTextColor: '#FFFFFF',
       // 连线与主文本
-      lineColor: '#78716C',
-      textColor: '#44403C',
-      // 分组框：暖纸浅底 + 暖灰描边
-      clusterBkg: '#F5F1E9',
-      clusterBorder: '#D8CFC2',
+      lineColor: dark ? '#9C8F80' : '#78716C',
+      textColor: ink,
+      // 分组框：浅色暖纸 / 深色暖褐
+      clusterBkg: dark ? '#2A221C' : '#F5F1E9',
+      clusterBorder: dark ? '#4A3F36' : '#D8CFC2',
       // 边标签底
-      edgeLabelBackground: '#FFFDF8',
+      edgeLabelBackground: dark ? '#1F1814' : '#FFFDF8',
       fontFamily: FONT_FAMILY,
       // 时序图变量（与整体暖色一致）
       actorBkg: accent,
       actorBorder: accent,
       actorBorders: accent,
       actorTextColor: '#FFFFFF',
-      actorLineColor: '#A8A29E',
-      signalColor: '#57534E',
-      signalTextColor: '#44403C',
+      actorLineColor: dark ? '#8A7D6E' : '#A8A29E',
+      signalColor: inkSoft,
+      signalTextColor: ink,
       labelBoxBkgColor: softBg,
       labelBoxBorderColor: accent,
-      labelTextColor: '#44403C',
-      loopTextColor: '#44403C',
-      noteBkgColor: '#FDF8EC',
-      noteBorderColor: '#9C6B1E',
-      noteTextColor: '#44403C',
+      labelTextColor: ink,
+      loopTextColor: ink,
+      noteBkgColor: dark ? '#3A2E18' : '#FDF8EC',
+      noteBorderColor: dark ? '#E0A03A' : '#9C6B1E',
+      noteTextColor: ink,
       activationBkgColor: softBg,
       activationBorderColor: accent,
     },
@@ -67,22 +78,29 @@ export function withTheme(source: string, accent: string, softBg: string): strin
   return `%%{init: ${JSON.stringify(init)}}%%\n${source}`
 }
 
-/** 渲染成功后注入 svg 的纯静态样式（不拼接任何动态内容；导出供校验脚本断言） */
-export const SVG_STATIC_STYLE = [
-  '.nodeLabel{font-weight:600}',
-  '.edgePath .path{stroke-width:2px}',
-  '.cluster rect{rx:12px}',
-  '.edgeLabel{border-radius:6px}',
-  '.messageLine0,.messageLine1{stroke-width:1.5px}',
-  '.note{rx:8px}',
-  // 边标签文字颜色覆盖：mermaid 的 #id .label{color} 规则派生自 primaryTextColor(#FFFFFF)，
-  // 白字压白底（edgeLabelBackground #FFFDF8）导致边标签隐形；mermaid 规则带 #id 前缀，必须 !important
-  '.edgeLabel,.edgeLabel p,.edgeLabel span{color:#44403C!important}',
-  '.edgeLabel text,.edgeLabel tspan{fill:#44403C!important}',
-  // cluster 标题色：mermaid 将 accent 淡化（如 #C58F62）置于浅底（#F5F1E9）对比度不足，统一压为 stone-600
-  '.cluster-label span{color:#57534E!important}',
-  '.cluster-label text{fill:#57534E!important}',
-].join('')
+/** 渲染成功后注入 svg 的静态样式；默认 light，供校验脚本断言边标签覆盖 */
+export function svgStaticStyle(mode: DiagramMode = 'light'): string {
+  const ink = mode === 'dark' ? '#E8E0D4' : '#44403C'
+  const cluster = mode === 'dark' ? '#D6CABB' : '#57534E'
+  return [
+    '.nodeLabel{font-weight:600}',
+    '.edgePath .path{stroke-width:2px}',
+    '.cluster rect{rx:12px}',
+    '.edgeLabel{border-radius:6px}',
+    '.messageLine0,.messageLine1{stroke-width:1.5px}',
+    '.note{rx:8px}',
+    // 边标签文字颜色覆盖：mermaid 的 #id .label{color} 规则派生自 primaryTextColor(#FFFFFF)，
+    // 白字压白底（edgeLabelBackground）导致边标签隐形；mermaid 规则带 #id 前缀，必须 !important
+    `.edgeLabel,.edgeLabel p,.edgeLabel span{color:${ink}!important}`,
+    `.edgeLabel text,.edgeLabel tspan{fill:${ink}!important}`,
+    // cluster 标题色：保证浅/深底上的可读性
+    `.cluster-label span{color:${cluster}!important}`,
+    `.cluster-label text{fill:${cluster}!important}`,
+  ].join('')
+}
+
+/** @deprecated 校验脚本兼容：固定为浅色覆盖片段 */
+export const SVG_STATIC_STYLE = svgStaticStyle('light')
 
 type Status = 'loading' | 'done' | 'error'
 type Mode = 'preview' | 'edit'
@@ -187,6 +205,7 @@ function writeStoredView(storageKey: string, view: StoredView): void {
  * 无存储视图时以「推荐比例」（auto-fit 吸附最近分档）居中展示；有存储则保持用户喜好
  */
 export function MermaidDiagram({ source, accent, softBg, note, className, storageKey }: MermaidDiagramProps) {
+  const { resolved: themeMode } = useTheme()
   const rawId = useId().replace(/[^a-zA-Z0-9]/g, '')
   const viewportRef = useRef<HTMLDivElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
@@ -295,7 +314,7 @@ export function MermaidDiagram({ source, accent, softBg, note, className, storag
     setError('')
 
     mermaid
-      .render(renderId, withTheme(source, accent, softBg))
+      .render(renderId, withTheme(source, accent, softBg, themeMode))
       .then(({ svg }) => {
         if (cancelled || !svgHostRef.current) return
         svgHostRef.current.innerHTML = svg
@@ -311,7 +330,7 @@ export function MermaidDiagram({ source, accent, softBg, note, className, storag
           el.style.display = 'block'
           // 注入纯静态样式（字重 / 边线宽 / 分组框圆角等）
           const styleEl = document.createElementNS('http://www.w3.org/2000/svg', 'style')
-          styleEl.textContent = SVG_STATIC_STYLE
+          styleEl.textContent = svgStaticStyle(themeMode)
           el.insertBefore(styleEl, el.firstChild)
           viewRef.current.gw = w
           viewRef.current.gh = h
@@ -344,7 +363,7 @@ export function MermaidDiagram({ source, accent, softBg, note, className, storag
       cancelled = true
       if (stageRef.current) stageRef.current.style.visibility = 'hidden'
     }
-  }, [source, accent, softBg, rawId, storageKey, applyView, computeRecommended, fitToRecommended])
+  }, [source, accent, softBg, themeMode, rawId, storageKey, applyView, computeRecommended, fitToRecommended])
 
   // 容器尺寸变化：仅在「无存储视图」时重新自适应，有存储视图则保持用户喜好
   useEffect(() => {
@@ -481,10 +500,10 @@ export function MermaidDiagram({ source, accent, softBg, note, className, storag
   }, [applyView])
 
   const toolButtonClass =
-    'flex h-7 w-7 items-center justify-center rounded-lg border border-[#E4DCCF] bg-[#FFFDF8]/95 text-stone-600 shadow-sm transition-colors hover:bg-[#F5EFE3] hover:text-stone-800 disabled:cursor-not-allowed disabled:opacity-40'
+    'flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-paper/95 text-ink-soft shadow-sm transition-colors hover:bg-paper-2 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40'
 
   const toolTextButtonClass =
-    'flex h-7 items-center gap-1 rounded-lg border border-[#E4DCCF] bg-[#FFFDF8]/95 px-2 text-xs text-stone-600 shadow-sm transition-colors hover:bg-[#F5EFE3] hover:text-stone-800'
+    'flex h-7 items-center gap-1 rounded-lg border border-border bg-paper/95 px-2 text-xs text-ink-soft shadow-sm transition-colors hover:bg-paper-2 hover:text-foreground'
 
   const percent = Math.round(displayK * 100)
   const currentTier = SCALE_TIERS.find((t) => Math.abs(t - displayK) <= TIER_EPSILON) ?? null
@@ -496,7 +515,7 @@ export function MermaidDiagram({ source, accent, softBg, note, className, storag
       <div className="relative">
         <div
           ref={viewportRef}
-          className="relative h-[400px] touch-none overflow-hidden rounded-xl border border-[#E7DFD2] bg-[#FFFDF8] sm:h-[480px]"
+          className="relative h-[400px] touch-none overflow-hidden rounded-xl border border-border bg-paper sm:h-[480px]"
           style={{
             cursor: 'grab',
             backgroundImage: 'radial-gradient(circle, rgba(203, 191, 172, 0.28) 1px, transparent 1px)',
@@ -516,7 +535,7 @@ export function MermaidDiagram({ source, accent, softBg, note, className, storag
           {/* 顶部加载进度条 */}
           {status === 'loading' && (
             <div
-              className="absolute inset-x-0 top-0 z-10 h-0.5 overflow-hidden rounded-full bg-stone-100"
+              className="absolute inset-x-0 top-0 z-10 h-0.5 overflow-hidden rounded-full bg-muted"
               aria-hidden
             >
               <div
@@ -538,7 +557,7 @@ export function MermaidDiagram({ source, accent, softBg, note, className, storag
                   {error}
                 </p>
                 <details className="mt-2">
-                  <summary className="cursor-pointer text-xs text-stone-400 hover:text-stone-600">
+                  <summary className="cursor-pointer text-xs text-muted-foreground hover:text-ink-soft">
                     查看 Mermaid 源码
                   </summary>
                   <pre className="mt-2 overflow-x-auto rounded-lg bg-[#292420] p-3 font-mono text-[11px] leading-5 text-[#F3EDE3]">
@@ -552,7 +571,7 @@ export function MermaidDiagram({ source, accent, softBg, note, className, storag
 
         {/* 悬浮工具条：右上角，暖色统一 */}
         {status === 'done' && mode === 'preview' && (
-          <div className="absolute right-2 top-2 z-20 flex items-center gap-1 rounded-lg border border-[#E4DCCF] bg-[#FFFDF8]/95 p-1 shadow-sm">
+          <div className="absolute right-2 top-2 z-20 flex items-center gap-1 rounded-lg border border-border bg-paper/95 p-1 shadow-sm">
             <button
               type="button"
               aria-label="编辑"
@@ -566,7 +585,7 @@ export function MermaidDiagram({ source, accent, softBg, note, className, storag
             <span
               aria-label="预览"
               title="预览"
-              className="min-w-[3rem] px-1 text-center text-xs tabular-nums text-stone-500"
+              className="min-w-[3rem] px-1 text-center text-xs tabular-nums text-muted-foreground"
             >
               {percent}%
             </span>
@@ -574,7 +593,7 @@ export function MermaidDiagram({ source, accent, softBg, note, className, storag
         )}
 
         {status === 'done' && mode === 'edit' && (
-          <div className="absolute right-2 top-2 z-20 flex items-center gap-1 rounded-lg border border-[#E4DCCF] bg-[#FFFDF8]/95 p-1 shadow-sm">
+          <div className="absolute right-2 top-2 z-20 flex items-center gap-1 rounded-lg border border-border bg-paper/95 p-1 shadow-sm">
             <button
               type="button"
               aria-label="缩小"
@@ -598,7 +617,7 @@ export function MermaidDiagram({ source, accent, softBg, note, className, storag
             <select
               aria-label="缩放比例"
               title="缩放比例"
-              className="h-7 cursor-pointer rounded-lg border border-[#E4DCCF] bg-[#FFFDF8] px-1 text-xs tabular-nums text-stone-600 shadow-sm transition-colors hover:bg-[#F5EFE3]"
+              className="h-7 cursor-pointer rounded-lg border border-border bg-paper px-1 text-xs tabular-nums text-ink-soft shadow-sm transition-colors hover:bg-paper-2"
               value={currentTier !== null ? String(currentTier) : 'current'}
               onChange={(e) => {
                 const target = Number(e.target.value)
@@ -646,7 +665,7 @@ export function MermaidDiagram({ source, accent, softBg, note, className, storag
           </div>
         )}
       </div>
-      {note && <p className="mt-3 text-center text-xs text-stone-400">{note}</p>}
+      {note && <p className="mt-3 text-center text-xs text-muted-foreground">{note}</p>}
     </div>
   )
 }

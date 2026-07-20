@@ -21,6 +21,7 @@ import { layerById, toolsByLayer } from '@/data/stack'
 import { LayerHeader } from '@/components/stack/LayerHeader'
 import { SectionShell } from '@/components/stack/SectionShell'
 import { ToolCard } from '@/components/stack/ToolCard'
+import { useLayerSoftBackground } from '@/lib/layer-surface'
 
 /** 示意条外壳 —— 居中标题 + 可选底部小字注解 */
 function DiagramStrip({
@@ -35,17 +36,17 @@ function DiagramStrip({
   children: ReactNode
 }) {
   return (
-    <figure className="shadow-warm rounded-2xl border border-stone-200/80 bg-[#FFFDF8] px-5 py-6 sm:px-8 sm:py-8">
+    <figure className="shadow-warm rounded-2xl border border-border/80 bg-paper px-5 py-6 sm:px-8 sm:py-8">
       <figcaption className="mb-7 flex items-center justify-center gap-2">
         <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: accent }} />
-        <span className="font-mono text-xs font-medium tracking-widest text-stone-500">
+        <span className="font-mono text-xs font-medium tracking-widest text-muted-foreground">
           {title}
         </span>
         <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: accent }} />
       </figcaption>
       {children}
       {caption && (
-        <p className="mt-7 text-center text-xs tracking-wide text-stone-500">{caption}</p>
+        <p className="mt-7 text-center text-xs tracking-wide text-muted-foreground">{caption}</p>
       )}
     </figure>
   )
@@ -55,8 +56,8 @@ function DiagramStrip({
 function FlowArrow() {
   return (
     <>
-      <ArrowDown className="h-5 w-5 shrink-0 text-stone-400 md:hidden" aria-hidden />
-      <ArrowRight className="hidden h-5 w-5 shrink-0 text-stone-400 md:block" aria-hidden />
+      <ArrowDown className="h-5 w-5 shrink-0 text-muted-foreground md:hidden" aria-hidden />
+      <ArrowRight className="hidden h-5 w-5 shrink-0 text-muted-foreground md:block" aria-hidden />
     </>
   )
 }
@@ -65,8 +66,8 @@ function FlowArrow() {
 function BiArrow() {
   return (
     <>
-      <ArrowUpDown className="h-5 w-5 shrink-0 text-stone-400 md:hidden" aria-hidden />
-      <ArrowLeftRight className="hidden h-5 w-5 shrink-0 text-stone-400 md:block" aria-hidden />
+      <ArrowUpDown className="h-5 w-5 shrink-0 text-muted-foreground md:hidden" aria-hidden />
+      <ArrowLeftRight className="hidden h-5 w-5 shrink-0 text-muted-foreground md:block" aria-hidden />
     </>
   )
 }
@@ -85,15 +86,16 @@ function NodeBox({
   accent: string
   softBg: string
 }) {
+  const soft = useLayerSoftBackground(softBg, accent)
   return (
     <div
       className="flex items-center gap-2.5 rounded-2xl border px-5 py-4"
-      style={{ backgroundColor: softBg, borderColor: `${accent}33` }}
+      style={{ backgroundColor: soft, borderColor: `${accent}44` }}
     >
       <Icon className="h-6 w-6 shrink-0" style={{ color: accent }} />
       <div>
-        <p className="text-sm font-bold text-stone-800">{title}</p>
-        <p className="mt-0.5 text-[11px] text-stone-500">{sub}</p>
+        <p className="text-sm font-bold text-foreground">{title}</p>
+        <p className="mt-0.5 text-[11px] text-muted-foreground">{sub}</p>
       </div>
     </div>
   )
@@ -117,7 +119,7 @@ export default function InfraSection() {
               {['GPT', 'Claude', 'Gemini', 'DeepSeek'].map((m) => (
                 <span
                   key={m}
-                  className="rounded-full border border-stone-300 bg-white px-3 py-1 text-center font-mono text-xs font-medium text-stone-600"
+                  className="rounded-full border border-border bg-card px-3 py-1 text-center font-mono text-xs font-medium text-ink-soft"
                 >
                   {m}
                 </span>
@@ -184,14 +186,14 @@ export default function InfraSection() {
               ].map(({ icon: Icon, label }) => (
                 <div
                   key={label}
-                  className="flex items-center gap-2.5 rounded-xl border border-stone-200 bg-[#FFFDF8] px-3.5 py-2"
+                  className="flex items-center gap-2.5 rounded-xl border border-border bg-paper px-3.5 py-2"
                 >
                   <Icon className="h-4 w-4 shrink-0" style={{ color: protocol.accent }} />
                   <div>
-                    <p className="font-mono text-[10px] uppercase leading-tight text-stone-400">
+                    <p className="font-mono text-[10px] uppercase leading-tight text-muted-foreground">
                       MCP Server
                     </p>
-                    <p className="text-xs font-medium leading-tight text-stone-700">{label}</p>
+                    <p className="text-xs font-medium leading-tight text-foreground/90">{label}</p>
                   </div>
                 </div>
               ))}
@@ -239,7 +241,7 @@ export default function InfraSection() {
                 ].map(({ icon: Icon, label }) => (
                   <span
                     key={label}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-stone-200 bg-white px-2.5 py-1 text-[11px] font-medium text-stone-600"
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-2.5 py-1 text-[11px] font-medium text-ink-soft"
                   >
                     <Icon className="h-3 w-3" style={{ color: sandbox.accent }} />
                     {label}
@@ -249,16 +251,16 @@ export default function InfraSection() {
             </div>
             <FlowArrow />
             {/* 执行结果 */}
-            <div className="flex items-center gap-2.5 rounded-2xl border border-stone-200 bg-[#FFFDF8] px-5 py-4">
+            <div className="flex items-center gap-2.5 rounded-2xl border border-border bg-paper px-5 py-4">
               <Terminal className="h-6 w-6 shrink-0" style={{ color: sandbox.accent }} />
               <div>
-                <p className="text-sm font-bold text-stone-800">执行结果</p>
-                <p className="mt-0.5 text-[11px] text-stone-500">日志 · 输出 · 测试报告</p>
+                <p className="text-sm font-bold text-foreground">执行结果</p>
+                <p className="mt-0.5 text-[11px] text-muted-foreground">日志 · 输出 · 测试报告</p>
               </div>
             </div>
           </div>
           {/* 循环回传 */}
-          <p className="mt-6 flex items-center justify-center gap-2 text-xs text-stone-500">
+          <p className="mt-6 flex items-center justify-center gap-2 text-xs text-muted-foreground">
             <RefreshCw className="h-3.5 w-3.5" style={{ color: sandbox.accent }} />
             结果回传 Agent，驱动自我修正闭环
           </p>

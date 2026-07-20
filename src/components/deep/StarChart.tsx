@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react'
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import type { StarPoint } from '@/data/deepDive'
+import { useTheme } from '@/hooks/use-theme'
 
 const fmt = (v: number) => (v >= 1000 ? `${(v / 1000).toFixed(1)}k` : String(v))
 
@@ -9,6 +11,16 @@ interface DotProps {
   index?: number
 }
 
+function useCssColor(varName: string, fallback: string) {
+  const { resolved } = useTheme()
+  const [color, setColor] = useState(fallback)
+  useEffect(() => {
+    const raw = getComputedStyle(document.documentElement).getPropertyValue(varName).trim()
+    setColor(raw ? `hsl(${raw})` : fallback)
+  }, [resolved, varName, fallback])
+  return color
+}
+
 /**
  * Star 趋势图 —— 月度 star 序列面积图（暖色系，末端最新值标注）
  */
@@ -16,6 +28,9 @@ export function StarChart({ data, accent }: { data: StarPoint[]; accent: string 
   const chartData = data.map((p) => ({ ...p, label: p.date.slice(2) }))
   const lastIdx = chartData.length - 1
   const lastVal = lastIdx >= 0 ? chartData[lastIdx].stars : 0
+  const paper = useCssColor('--paper', '#FFFDF8')
+  const border = useCssColor('--border', '#E7E0D4')
+  const muted = useCssColor('--muted-foreground', '#A8A29E')
 
   /** 只在最后一个数据点渲染圆点 + 数值 */
   const endDot = (props: DotProps) => {
@@ -24,7 +39,7 @@ export function StarChart({ data, accent }: { data: StarPoint[]; accent: string 
     return (
       <g key="dot-end">
         <circle cx={cx} cy={cy} r={8} fill={accent} opacity={0.18} />
-        <circle cx={cx} cy={cy} r={4} fill={accent} stroke="#FFFDF8" strokeWidth={1.5} />
+        <circle cx={cx} cy={cy} r={4} fill={accent} stroke={paper} strokeWidth={1.5} />
         <text
           x={cx - 6}
           y={cy - 12}
@@ -51,13 +66,13 @@ export function StarChart({ data, accent }: { data: StarPoint[]; accent: string 
           </defs>
           <XAxis
             dataKey="label"
-            tick={{ fontSize: 11, fill: '#A8A29E' }}
+            tick={{ fontSize: 11, fill: muted }}
             tickLine={false}
-            axisLine={{ stroke: '#E7E0D4' }}
+            axisLine={{ stroke: border }}
             minTickGap={40}
           />
           <YAxis
-            tick={{ fontSize: 11, fill: '#A8A29E' }}
+            tick={{ fontSize: 11, fill: muted }}
             tickLine={false}
             axisLine={false}
             tickFormatter={fmt}
@@ -67,10 +82,11 @@ export function StarChart({ data, accent }: { data: StarPoint[]; accent: string 
             formatter={(value: number) => [value.toLocaleString(), 'Stars']}
             labelFormatter={(l) => `20${l}`}
             contentStyle={{
-              background: '#FFFDF8',
-              border: '1px solid #E7E0D4',
+              background: paper,
+              border: `1px solid ${border}`,
               borderRadius: 10,
               fontSize: 12,
+              color: muted,
             }}
           />
           <Area
@@ -88,6 +104,4 @@ export function StarChart({ data, accent }: { data: StarPoint[]; accent: string 
 }
 
 /** 格式化大数字（供外部统计行复用） */
-export function formatStars(v: number): string {
-  return v >= 1000 ? `${(v / 1000).toFixed(1)}k` : String(v)
-}
+export const formatStars = fmt

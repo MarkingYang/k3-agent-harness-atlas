@@ -15,6 +15,7 @@ import { LayerHeader } from '@/components/stack/LayerHeader'
 import { SectionShell } from '@/components/stack/SectionShell'
 import { ToolCard } from '@/components/stack/ToolCard'
 import { cn } from '@/lib/utils'
+import { useLayerSoftBackground } from '@/lib/layer-surface'
 
 /** 状态机流程图节点 —— accent 描边的圆角小框 */
 function FlowNode({
@@ -34,13 +35,17 @@ function FlowNode({
   accent: string
   softBg: string
 }) {
+  const soft = useLayerSoftBackground(softBg, accent)
   return (
     <div
       className={cn(
-        'flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-semibold text-stone-700 sm:text-sm',
+        'flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-semibold text-foreground sm:text-sm',
         dashed && 'border-dashed',
       )}
-      style={{ borderColor: accent, backgroundColor: dashed ? '#FFFDF8' : softBg }}
+      style={{
+        borderColor: accent,
+        backgroundColor: dashed ? 'hsl(var(--paper))' : soft,
+      }}
     >
       <Icon className="h-3.5 w-3.5 shrink-0" style={{ color: accent }} />
       <span>{label}</span>
@@ -55,7 +60,7 @@ function FlowNode({
 
 /** 节点间的单向箭头 */
 function FlowArrow() {
-  return <ArrowRight className="h-4 w-4 shrink-0 text-stone-300" aria-hidden />
+  return <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground/50" aria-hidden />
 }
 
 /**
@@ -81,12 +86,12 @@ export default function RuntimeSection() {
       </div>
 
       {/* ③ 运行时核心机制：状态机流程讲解条 */}
-      <div className="shadow-warm mt-10 rounded-2xl border border-stone-200/80 bg-[#FFFDF8] p-6 sm:p-8">
+      <div className="shadow-warm mt-10 rounded-2xl border border-border/80 bg-paper p-6 sm:p-8">
         <div className="flex items-center gap-2.5">
           <Workflow className="h-5 w-5" style={{ color: runtimeLayer.accent }} />
-          <h4 className="text-lg font-bold tracking-tight text-stone-800">运行时核心机制</h4>
+          <h4 className="text-lg font-bold tracking-tight text-foreground">运行时核心机制</h4>
         </div>
-        <p className="mt-2 max-w-3xl text-sm leading-7 text-stone-500">
+        <p className="mt-2 max-w-3xl text-sm leading-7 text-muted-foreground">
           一次 Agent 执行的本质，是在一张状态图上流转：模型推理决定下一步动作，工具调用改变外部世界，必要时暂停等待人的裁决。
         </p>
 
@@ -111,7 +116,7 @@ export default function RuntimeSection() {
               style={{ color: runtimeLayer.accent }}
               aria-label="推理与工具调用双向循环"
             />
-            <span className="mt-0.5 text-[10px] text-stone-400">多轮循环</span>
+            <span className="mt-0.5 text-[10px] text-muted-foreground">多轮循环</span>
           </span>
           <FlowNode
             icon={Wrench}
@@ -137,7 +142,7 @@ export default function RuntimeSection() {
           />
         </div>
 
-        <p className="mt-6 flex items-start gap-2 border-t border-dashed border-stone-200 pt-4 text-xs leading-6 text-stone-500">
+        <p className="mt-6 flex items-start gap-2 border-t border-dashed border-border pt-4 text-xs leading-6 text-muted-foreground">
           <History
             className="mt-0.5 h-3.5 w-3.5 shrink-0"
             style={{ color: runtimeLayer.accent }}
@@ -152,7 +157,7 @@ export default function RuntimeSection() {
       </div>
 
       {/* ⑤ 过渡文案 + AutoGen 卡片 */}
-      <p className="mx-auto mb-8 max-w-3xl text-sm leading-7 text-stone-500">
+      <p className="mx-auto mb-8 max-w-3xl text-sm leading-7 text-muted-foreground">
         当任务超出单个 Agent 的能力边界，一种自然的思路是让多个具备不同角色与工具的
         Agent 通过对话协作：相互提问、复核与分工。此时「谁发言、谁决策、何时终止」都成为需要显式设计的工程问题。
         AutoGen 正是这一「对话驱动协作」范式的代表实现。

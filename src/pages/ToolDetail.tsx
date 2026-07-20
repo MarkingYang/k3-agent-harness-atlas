@@ -26,6 +26,8 @@ import { toolDetailById } from '@/data/tools/index'
 import { deepDiveById } from '@/data/deep/index'
 import type { FeatureItem } from '@/data/deepDive'
 import { DETAIL_LABELS, useLanguage } from '@/hooks/use-language'
+import { useTheme } from '@/hooks/use-theme'
+import { layerSoftBackground, useLayerSoftBackground } from '@/lib/layer-surface'
 import Navbar from '@/sections/Navbar'
 import Footer from '@/sections/Footer'
 import { PriorityStars } from '@/components/stack/PriorityStars'
@@ -75,7 +77,7 @@ const RELATION_FALLBACK = { bg: 'rgba(87, 83, 78, 0.08)', fg: '#57534E' }
 /** 统一小节标题：accent 色小方块 + 标题（对应 DETAIL_LABELS） */
 function DeepSectionTitle({ title, accent }: { title: string; accent: string }) {
   return (
-    <h2 className="flex items-center gap-2.5 text-lg font-bold tracking-tight text-stone-800">
+    <h2 className="flex items-center gap-2.5 text-lg font-bold tracking-tight text-foreground">
       <span
         aria-hidden
         className="h-3 w-3 shrink-0 rounded-[5px]"
@@ -93,7 +95,7 @@ function NumberedFeatureGrid({ items, color }: { items: FeatureItem[]; color: st
       {items.map((f, i) => (
         <div
           key={f.title}
-          className="shadow-warm flex gap-4 rounded-2xl border border-stone-200/80 bg-[#FFFDF8] p-5"
+          className="shadow-warm flex gap-4 rounded-2xl border border-border/80 bg-paper p-5"
         >
           <span
             className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs font-bold text-white"
@@ -102,8 +104,8 @@ function NumberedFeatureGrid({ items, color }: { items: FeatureItem[]; color: st
             {i + 1}
           </span>
           <div>
-            <h3 className="text-sm font-semibold text-stone-800">{f.title}</h3>
-            <p className="mt-1.5 text-sm leading-6 text-stone-500">{f.desc}</p>
+            <h3 className="text-sm font-semibold text-foreground">{f.title}</h3>
+            <p className="mt-1.5 text-sm leading-6 text-muted-foreground">{f.desc}</p>
           </div>
         </div>
       ))}
@@ -132,8 +134,8 @@ function StatItem({
         <Icon className="h-4 w-4" />
       </span>
       <span className="min-w-0">
-        <span className="block text-[11px] text-stone-400">{label}</span>
-        <span className="block truncate font-mono text-sm font-semibold text-stone-700">{value}</span>
+        <span className="block text-[11px] text-muted-foreground">{label}</span>
+        <span className="block truncate font-mono text-sm font-semibold text-foreground/90">{value}</span>
       </span>
     </div>
   )
@@ -160,8 +162,8 @@ function CopyButton({ text, dark = false }: { text: string; dark?: boolean }) {
       aria-label={copied ? '已复制' : '复制'}
       className={
         dark
-          ? 'flex h-7 w-7 items-center justify-center rounded-md text-stone-400 transition-colors hover:bg-white/10 hover:text-stone-100'
-          : 'flex h-7 w-7 items-center justify-center rounded-md text-stone-400 transition-colors hover:bg-stone-200/70 hover:text-stone-700'
+          ? 'flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-card/10 hover:text-foreground'
+          : 'flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground/90'
       }
     >
       {copied ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}
@@ -191,6 +193,8 @@ function CodeBlock({ code, dark = true }: { code: string; dark?: boolean }) {
 export default function ToolDetail() {
   const { toolId } = useParams<{ toolId: string }>()
   const { lang } = useLanguage()
+  const { resolved } = useTheme()
+  const dark = resolved === 'dark'
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -201,6 +205,7 @@ export default function ToolDetail() {
   const deep = toolId ? deepDiveById(toolId) : undefined
   const L = DETAIL_LABELS[lang]
   const layer = tool ? layerById(tool.layerId) : undefined
+  const soft = useLayerSoftBackground(layer?.softBg ?? '#EEF2F7', layer?.accent ?? '#0D9488')
   const siblings = tool ? toolsByLayer(tool.layerId).filter((t) => t.id !== tool.id) : []
 
   /** 页内目录项：problem 起至 related 止，deep 缺失的小节不收录 */
@@ -260,12 +265,12 @@ export default function ToolDetail() {
       <div className="flex min-h-screen flex-col">
         <Navbar />
         <main className="mx-auto flex w-full max-w-4xl flex-1 items-center justify-center px-5 py-24 sm:px-8">
-          <div className="shadow-warm w-full max-w-md rounded-2xl border border-stone-200/80 bg-[#FFFDF8] p-10 text-center">
-            <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-stone-100 text-stone-400">
+          <div className="shadow-warm w-full max-w-md rounded-2xl border border-border/80 bg-paper p-10 text-center">
+            <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
               <SearchX className="h-7 w-7" />
             </span>
-            <h1 className="mt-5 text-xl font-bold text-stone-800">未找到该项目</h1>
-            <p className="mt-2 text-sm leading-6 text-stone-500">
+            <h1 className="mt-5 text-xl font-bold text-foreground">未找到该项目</h1>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
               你访问的项目不存在，或详情内容尚未收录。可以回到首页浏览完整技术栈全景。
             </p>
             <Link
@@ -293,35 +298,35 @@ export default function ToolDetail() {
 
       <main className="mx-auto w-full max-w-6xl flex-1 px-5 pb-20 pt-10 sm:px-8">
         {/* 面包屑 */}
-        <nav aria-label="breadcrumb" className="flex flex-wrap items-center gap-1.5 text-xs text-stone-500">
-          <a href="/" className="inline-flex items-center gap-1 rounded-md px-1 py-0.5 transition-colors hover:text-stone-800">
+        <nav aria-label="breadcrumb" className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+          <a href="/" className="inline-flex items-center gap-1 rounded-md px-1 py-0.5 transition-colors hover:text-foreground">
             <Home className="h-3.5 w-3.5" />
             {lang === 'zh' ? '首页' : 'Home'}
           </a>
-          <ChevronRight className="h-3 w-3 text-stone-300" />
-          <a href={`/#${anchor}`} className="rounded-md px-1 py-0.5 transition-colors hover:text-stone-800">
+          <ChevronRight className="h-3 w-3 text-muted-foreground/50" />
+          <a href={`/#${anchor}`} className="rounded-md px-1 py-0.5 transition-colors hover:text-foreground">
             {lang === 'zh' ? layer.zhName : layer.name}
           </a>
-          <ChevronRight className="h-3 w-3 text-stone-300" />
-          <span className="px-1 py-0.5 font-medium text-stone-700">{tool.name}</span>
+          <ChevronRight className="h-3 w-3 text-muted-foreground/50" />
+          <span className="px-1 py-0.5 font-medium text-foreground/90">{tool.name}</span>
         </nav>
 
         <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_224px] lg:gap-10">
           <div className="min-w-0">
             {/* Hero 区 */}
             <section
-              className="shadow-warm mt-6 rounded-2xl border border-stone-200/60 p-7 sm:p-9"
-              style={{ backgroundColor: layer.softBg }}
+              className="shadow-warm mt-6 rounded-2xl border border-border/60 p-7 sm:p-9"
+              style={{ backgroundColor: soft }}
             >
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: layer.accent }}>
                     {layer.name} · {layer.zhName}
                   </p>
-                  <h1 className="mt-2 text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">
+                  <h1 className="mt-2 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
                     {tool.name}
                   </h1>
-                  <p className="mt-2 text-sm text-stone-600">
+                  <p className="mt-2 text-sm text-ink-soft">
                     {lang === 'en' && deep ? deep.en.tagline : detail.tagline}
                   </p>
                 </div>
@@ -333,7 +338,7 @@ export default function ToolDetail() {
                   href={`https://github.com/${tool.repo}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-white/70 px-3 py-1.5 font-mono text-xs text-stone-600 transition-colors hover:bg-white hover:text-stone-900"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-card/70 px-3 py-1.5 font-mono text-xs text-ink-soft transition-colors hover:bg-card hover:text-foreground"
                 >
                   <Github className="h-3.5 w-3.5" />
                   {tool.repo}
@@ -345,7 +350,7 @@ export default function ToolDetail() {
                   <Boxes className="h-3.5 w-3.5" />
                   {tool.harnessModule}
                 </span>
-                <span className="text-xs text-stone-600">{tool.coreRole}</span>
+                <span className="text-xs text-ink-soft">{tool.coreRole}</span>
               </div>
             </section>
 
@@ -357,10 +362,10 @@ export default function ToolDetail() {
             {/* 英文简述卡（仅英文模式且有深度数据时显示） */}
             {lang === 'en' && deep && (
               <section
-                className="shadow-warm mt-6 rounded-2xl border border-stone-200/80 bg-[#FFFDF8] p-6 sm:p-7"
+                className="shadow-warm mt-6 rounded-2xl border border-border/80 bg-paper p-6 sm:p-7"
                 style={{ borderLeftColor: layer.accent, borderLeftWidth: 3 }}
               >
-                <p className="text-sm leading-7 text-stone-600 sm:text-[15px] sm:leading-8">
+                <p className="text-sm leading-7 text-ink-soft sm:text-[15px] sm:leading-8">
                   {deep.en.summary}
                 </p>
               </section>
@@ -369,7 +374,7 @@ export default function ToolDetail() {
             {/* 它解决什么问题 */}
             <section id="sec-problem" className="mt-14 scroll-mt-24">
               <DeepSectionTitle title={L.problem} accent={layer.accent} />
-              <p className="mt-4 text-sm leading-7 text-stone-600 sm:text-[15px] sm:leading-8">
+              <p className="mt-4 text-sm leading-7 text-ink-soft sm:text-[15px] sm:leading-8">
                 {detail.problem}
               </p>
             </section>
@@ -381,7 +386,7 @@ export default function ToolDetail() {
                 {detail.architecture.map((item, i) => (
                   <li
                     key={item.title}
-                    className="shadow-warm flex gap-4 rounded-2xl border border-stone-200/80 bg-[#FFFDF8] p-5"
+                    className="shadow-warm flex gap-4 rounded-2xl border border-border/80 bg-paper p-5"
                   >
                     <span
                       className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
@@ -390,8 +395,8 @@ export default function ToolDetail() {
                       {i + 1}
                     </span>
                     <div>
-                      <h3 className="text-sm font-semibold text-stone-800">{item.title}</h3>
-                      <p className="mt-1 text-sm leading-6 text-stone-500">{item.desc}</p>
+                      <h3 className="text-sm font-semibold text-foreground">{item.title}</h3>
+                      <p className="mt-1 text-sm leading-6 text-muted-foreground">{item.desc}</p>
                     </div>
                   </li>
                 ))}
@@ -406,7 +411,7 @@ export default function ToolDetail() {
                   {deep.mechanism.map((m, i) => (
                     <li
                       key={m.title}
-                      className="shadow-warm flex gap-5 rounded-2xl border border-stone-200/80 bg-[#FFFDF8] p-6 sm:p-7"
+                      className="shadow-warm flex gap-5 rounded-2xl border border-border/80 bg-paper p-6 sm:p-7"
                     >
                       <span
                         aria-hidden
@@ -416,8 +421,8 @@ export default function ToolDetail() {
                         {String(i + 1).padStart(2, '0')}
                       </span>
                       <div className="min-w-0">
-                        <h3 className="text-[15px] font-bold text-stone-800">{m.title}</h3>
-                        <p className="mt-2 text-sm leading-7 text-stone-600">{m.desc}</p>
+                        <h3 className="text-[15px] font-bold text-foreground">{m.title}</h3>
+                        <p className="mt-2 text-sm leading-7 text-ink-soft">{m.desc}</p>
                       </div>
                     </li>
                   ))}
@@ -429,8 +434,8 @@ export default function ToolDetail() {
             {deep && (
               <section id="sec-architecture" className="mt-14 scroll-mt-24">
                 <DeepSectionTitle title={L.architecture} accent={layer.accent} />
-                <p className="mt-3 text-sm leading-7 text-stone-500">{deep.architecture.intro}</p>
-                <div className="shadow-warm mt-5 rounded-2xl border border-stone-200/80 bg-[#FFFDF8] p-5 sm:p-6">
+                <p className="mt-3 text-sm leading-7 text-muted-foreground">{deep.architecture.intro}</p>
+                <div className="shadow-warm mt-5 rounded-2xl border border-border/80 bg-paper p-5 sm:p-6">
                   <MermaidDiagram storageKey={`${toolId ?? 'unknown'}-architecture`} source={gridToMermaid(deep.architecture.diagram)} accent={layer.accent} softBg={layer.softBg} note={deep.architecture.diagram.note} />
                 </div>
               </section>
@@ -440,7 +445,7 @@ export default function ToolDetail() {
             {deep?.sourceLayout && deep.sourceLayout.length > 0 && (
               <section id="sec-source" className="mt-14 scroll-mt-24">
                 <DeepSectionTitle title={L.sourceLayout} accent={layer.accent} />
-                <div className="shadow-warm mt-6 divide-y divide-stone-100 rounded-2xl border border-stone-200/80 bg-[#FFFDF8]">
+                <div className="shadow-warm mt-6 divide-y divide-border rounded-2xl border border-border/80 bg-paper">
                   {deep.sourceLayout.map((d) => (
                     <div key={d.path} className="flex items-baseline gap-3 px-5 py-3.5 sm:px-6">
                       <Folder
@@ -453,7 +458,7 @@ export default function ToolDetail() {
                       >
                         {d.path}
                       </code>
-                      <span className="min-w-0 text-xs leading-5 text-stone-500">{d.role}</span>
+                      <span className="min-w-0 text-xs leading-5 text-muted-foreground">{d.role}</span>
                     </div>
                   ))}
                 </div>
@@ -464,8 +469,8 @@ export default function ToolDetail() {
             {deep && (
               <section id="sec-dataflow" className="mt-14 scroll-mt-24">
                 <DeepSectionTitle title={L.dataFlow} accent={layer.accent} />
-                <p className="mt-3 text-sm leading-7 text-stone-500">{deep.dataFlow.intro}</p>
-                <div className="shadow-warm mt-5 rounded-2xl border border-stone-200/80 bg-[#FFFDF8] p-5 sm:p-6">
+                <p className="mt-3 text-sm leading-7 text-muted-foreground">{deep.dataFlow.intro}</p>
+                <div className="shadow-warm mt-5 rounded-2xl border border-border/80 bg-paper p-5 sm:p-6">
                   <MermaidDiagram storageKey={`${toolId ?? 'unknown'}-dataFlow`} source={gridToMermaid(deep.dataFlow.diagram)} accent={layer.accent} softBg={layer.softBg} note={deep.dataFlow.diagram.note} />
                 </div>
               </section>
@@ -475,8 +480,8 @@ export default function ToolDetail() {
             {deep && (
               <section id="sec-sequence" className="mt-14 scroll-mt-24">
                 <DeepSectionTitle title={L.sequence} accent={layer.accent} />
-                <p className="mt-3 text-sm leading-7 text-stone-500">{deep.sequence.intro}</p>
-                <div className="shadow-warm mt-5 rounded-2xl border border-stone-200/80 bg-[#FFFDF8] p-5 sm:p-6">
+                <p className="mt-3 text-sm leading-7 text-muted-foreground">{deep.sequence.intro}</p>
+                <div className="shadow-warm mt-5 rounded-2xl border border-border/80 bg-paper p-5 sm:p-6">
                   <MermaidDiagram storageKey={`${toolId ?? 'unknown'}-sequence`} source={seqToMermaid(deep.sequence.diagram)} accent={layer.accent} softBg={layer.softBg} note={deep.sequence.diagram.note} />
                 </div>
               </section>
@@ -485,13 +490,13 @@ export default function ToolDetail() {
             {/* 关键概念（复用 stack.ts 的 concepts） */}
             <section id="sec-concepts" className="mt-14 scroll-mt-24">
               <DeepSectionTitle title={L.keyConcepts} accent={layer.accent} />
-              <dl className="shadow-warm mt-5 space-y-3 rounded-2xl border border-stone-200/80 bg-[#FFFDF8] p-6">
+              <dl className="shadow-warm mt-5 space-y-3 rounded-2xl border border-border/80 bg-paper p-6">
                 {tool.concepts.map((c) => (
                   <div key={c.term} className="grid gap-1 sm:grid-cols-[200px_1fr] sm:gap-4">
                     <dt className="text-sm font-semibold" style={{ color: layer.accent }}>
                       {c.term}
                     </dt>
-                    <dd className="text-sm leading-6 text-stone-500">{c.desc}</dd>
+                    <dd className="text-sm leading-6 text-muted-foreground">{c.desc}</dd>
                   </div>
                 ))}
               </dl>
@@ -502,20 +507,20 @@ export default function ToolDetail() {
               <DeepSectionTitle title={L.quickStart} accent={layer.accent} />
               <div className="mt-5 space-y-4">
                 <div>
-                  <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-stone-500">
+                  <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
                     <TerminalSquare className="h-3.5 w-3.5" />
                     安装
                   </p>
                   <CodeBlock code={detail.quickStart.install} />
                 </div>
                 <div>
-                  <p className="mb-2 text-xs font-semibold text-stone-500">
+                  <p className="mb-2 text-xs font-semibold text-muted-foreground">
                     最小示例（{detail.quickStart.lang}）
                   </p>
                   <CodeBlock code={detail.quickStart.code} />
                 </div>
                 {detail.quickStart.note && (
-                  <p className="text-xs leading-5 text-stone-400">{detail.quickStart.note}</p>
+                  <p className="text-xs leading-5 text-muted-foreground">{detail.quickStart.note}</p>
                 )}
               </div>
             </section>
@@ -544,10 +549,10 @@ export default function ToolDetail() {
                   {deep.tradeoffs.map((t) => (
                     <div
                       key={t.title}
-                      className="shadow-warm rounded-2xl border border-stone-200/80 bg-[#FFFDF8] p-6"
+                      className="shadow-warm rounded-2xl border border-border/80 bg-paper p-6"
                     >
                       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-                        <h3 className="text-sm font-bold text-stone-800">{t.title}</h3>
+                        <h3 className="text-sm font-bold text-foreground">{t.title}</h3>
                         <span
                           className="rounded-full px-2.5 py-1 text-xs font-medium"
                           style={{ backgroundColor: `${layer.accent}1A`, color: layer.accent }}
@@ -555,7 +560,7 @@ export default function ToolDetail() {
                           {t.choice}
                         </span>
                       </div>
-                      <p className="mt-3 text-sm leading-7 text-stone-500">{t.reason}</p>
+                      <p className="mt-3 text-sm leading-7 text-muted-foreground">{t.reason}</p>
                     </div>
                   ))}
                 </div>
@@ -569,10 +574,10 @@ export default function ToolDetail() {
                 {detail.useCases.map((uc) => (
                   <div
                     key={uc.title}
-                    className="shadow-warm rounded-2xl border border-stone-200/80 bg-[#FFFDF8] p-5"
+                    className="shadow-warm rounded-2xl border border-border/80 bg-paper p-5"
                   >
-                    <h3 className="text-sm font-semibold text-stone-800">{uc.title}</h3>
-                    <p className="mt-2 text-xs leading-6 text-stone-500">{uc.desc}</p>
+                    <h3 className="text-sm font-semibold text-foreground">{uc.title}</h3>
+                    <p className="mt-2 text-xs leading-6 text-muted-foreground">{uc.desc}</p>
                   </div>
                 ))}
               </div>
@@ -585,7 +590,7 @@ export default function ToolDetail() {
                 {detail.ecosystem.map((chip) => (
                   <span
                     key={chip}
-                    className="rounded-lg border border-stone-200 bg-[#FFFDF8] px-3 py-1.5 text-xs font-medium text-stone-600"
+                    className="rounded-lg border border-border bg-paper px-3 py-1.5 text-xs font-medium text-ink-soft"
                   >
                     {chip}
                   </span>
@@ -598,10 +603,10 @@ export default function ToolDetail() {
               <section id="sec-positioning" className="mt-14 scroll-mt-24">
                 <DeepSectionTitle title={L.positioning} accent={layer.accent} />
                 <div
-                  className="shadow-warm mt-5 rounded-2xl border border-stone-200/80 bg-[#FFFDF8] p-6 sm:p-7"
+                  className="shadow-warm mt-5 rounded-2xl border border-border/80 bg-paper p-6 sm:p-7"
                   style={{ borderLeftColor: layer.accent, borderLeftWidth: 3 }}
                 >
-                  <p className="text-sm leading-8 text-stone-600">{deep.positioning}</p>
+                  <p className="text-sm leading-8 text-ink-soft">{deep.positioning}</p>
                 </div>
               </section>
             )}
@@ -610,8 +615,8 @@ export default function ToolDetail() {
             {deep && (
               <section id="sec-landscape" className="mt-14 scroll-mt-24">
                 <DeepSectionTitle title={L.landscape} accent={layer.accent} />
-                <p className="mt-3 text-sm leading-7 text-stone-500">{deep.landscape.intro}</p>
-                <div className="shadow-warm mt-5 rounded-2xl border border-stone-200/80 bg-[#FFFDF8] p-5 sm:p-6">
+                <p className="mt-3 text-sm leading-7 text-muted-foreground">{deep.landscape.intro}</p>
+                <div className="shadow-warm mt-5 rounded-2xl border border-border/80 bg-paper p-5 sm:p-6">
                   <MermaidDiagram storageKey={`${toolId ?? 'unknown'}-landscape`} source={gridToMermaid(deep.landscape.diagram)} accent={layer.accent} softBg={layer.softBg} note={deep.landscape.diagram.note} />
                 </div>
               </section>
@@ -625,7 +630,7 @@ export default function ToolDetail() {
                   {deep.production.map((p) => (
                     <div
                       key={p.title}
-                      className="shadow-warm flex gap-4 rounded-2xl border border-stone-200/80 bg-[#FFFDF8] p-5"
+                      className="shadow-warm flex gap-4 rounded-2xl border border-border/80 bg-paper p-5"
                     >
                       <span
                         className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
@@ -634,8 +639,8 @@ export default function ToolDetail() {
                         <Wrench className="h-4 w-4" />
                       </span>
                       <div className="min-w-0">
-                        <h3 className="text-sm font-semibold text-stone-800">{p.title}</h3>
-                        <p className="mt-1.5 text-sm leading-6 text-stone-500">{p.desc}</p>
+                        <h3 className="text-sm font-semibold text-foreground">{p.title}</h3>
+                        <p className="mt-1.5 text-sm leading-6 text-muted-foreground">{p.desc}</p>
                       </div>
                     </div>
                   ))}
@@ -647,17 +652,17 @@ export default function ToolDetail() {
             {deep && (
               <section id="sec-competitors" className="mt-14 scroll-mt-24">
                 <DeepSectionTitle title={L.competitors} accent={layer.accent} />
-                <div className="shadow-warm mt-5 overflow-hidden rounded-2xl border border-stone-200/80 bg-[#FFFDF8]">
+                <div className="shadow-warm mt-5 overflow-hidden rounded-2xl border border-border/80 bg-paper">
                   <Table>
                     <TableHeader>
-                      <TableRow className="border-stone-200/80 hover:bg-transparent">
-                        <TableHead className="px-5 py-3.5 text-xs font-semibold text-stone-500">
+                      <TableRow className="border-border/80 hover:bg-transparent">
+                        <TableHead className="px-5 py-3.5 text-xs font-semibold text-muted-foreground">
                           {lang === 'zh' ? '项目' : 'Project'}
                         </TableHead>
-                        <TableHead className="px-5 py-3.5 text-xs font-semibold text-stone-500">
+                        <TableHead className="px-5 py-3.5 text-xs font-semibold text-muted-foreground">
                           {lang === 'zh' ? '关系' : 'Relation'}
                         </TableHead>
-                        <TableHead className="px-5 py-3.5 text-xs font-semibold text-stone-500">
+                        <TableHead className="px-5 py-3.5 text-xs font-semibold text-muted-foreground">
                           {lang === 'zh' ? '关键差异' : 'Key Difference'}
                         </TableHead>
                       </TableRow>
@@ -666,8 +671,8 @@ export default function ToolDetail() {
                       {deep.competitors.map((c) => {
                         const st = RELATION_STYLE[c.relation] ?? RELATION_FALLBACK
                         return (
-                          <TableRow key={c.name} className="border-stone-200/60 hover:bg-stone-50/60">
-                            <TableCell className="px-5 py-4 text-sm font-semibold text-stone-800">
+                          <TableRow key={c.name} className="border-border/60 hover:bg-muted/60">
+                            <TableCell className="px-5 py-4 text-sm font-semibold text-foreground">
                               {c.name}
                             </TableCell>
                             <TableCell className="px-5 py-4">
@@ -678,7 +683,7 @@ export default function ToolDetail() {
                                 {c.relation}
                               </span>
                             </TableCell>
-                            <TableCell className="whitespace-normal px-5 py-4 text-sm leading-6 text-stone-500">
+                            <TableCell className="whitespace-normal px-5 py-4 text-sm leading-6 text-muted-foreground">
                               {c.diff}
                             </TableCell>
                           </TableRow>
@@ -694,24 +699,24 @@ export default function ToolDetail() {
             {deep && (
               <section id="sec-versions" className="mt-14 scroll-mt-24">
                 <DeepSectionTitle title={L.versionHistory} accent={layer.accent} />
-                <div className="shadow-warm mt-5 rounded-2xl border border-stone-200/80 bg-[#FFFDF8] p-6 sm:p-7">
-                  <ol className="relative ml-1.5 space-y-6 border-l border-stone-200 pl-6">
+                <div className="shadow-warm mt-5 rounded-2xl border border-border/80 bg-paper p-6 sm:p-7">
+                  <ol className="relative ml-1.5 space-y-6 border-l border-border pl-6">
                     {deep.versions.map((v) => (
                       <li key={v.version} className="relative">
                         <span
                           aria-hidden
-                          className="absolute -left-[29px] top-1.5 h-2.5 w-2.5 rounded-full ring-4 ring-[#FFFDF8]"
+                          className="absolute -left-[29px] top-1.5 h-2.5 w-2.5 rounded-full ring-4 ring-paper"
                           style={{ backgroundColor: layer.accent }}
                         />
                         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                          <span className="font-mono text-sm font-bold text-stone-800">{v.version}</span>
-                          <span className="text-xs text-stone-400">{v.date}</span>
+                          <span className="font-mono text-sm font-bold text-foreground">{v.version}</span>
+                          <span className="text-xs text-muted-foreground">{v.date}</span>
                         </div>
-                        <p className="mt-1 text-sm leading-6 text-stone-500">{v.highlight}</p>
+                        <p className="mt-1 text-sm leading-6 text-muted-foreground">{v.highlight}</p>
                       </li>
                     ))}
                   </ol>
-                  <p className="mt-6 border-t border-dashed border-stone-200 pt-4 text-xs text-stone-400">
+                  <p className="mt-6 border-t border-dashed border-border pt-4 text-xs text-muted-foreground">
                     {L.sourceGh}
                   </p>
                 </div>
@@ -722,15 +727,15 @@ export default function ToolDetail() {
             {deep && (
               <section id="sec-stars" className="mt-14 scroll-mt-24">
                 <DeepSectionTitle title={L.starTrend} accent={layer.accent} />
-                <div className="shadow-warm mt-5 rounded-2xl border border-stone-200/80 bg-[#FFFDF8] p-6 sm:p-7">
+                <div className="shadow-warm mt-5 rounded-2xl border border-border/80 bg-paper p-6 sm:p-7">
                   <StarChart data={deep.starHistory} accent={layer.accent} />
-                  <div className="mt-6 grid grid-cols-2 gap-4 border-t border-dashed border-stone-200 pt-5 sm:grid-cols-4">
+                  <div className="mt-6 grid grid-cols-2 gap-4 border-t border-dashed border-border pt-5 sm:grid-cols-4">
                     <StatItem icon={Star} label="Stars" value={deep.stats.stars.toLocaleString()} accent={layer.accent} />
                     <StatItem icon={GitFork} label="Forks" value={deep.stats.forks.toLocaleString()} accent={layer.accent} />
                     <StatItem icon={Scale} label="License" value={deep.stats.license ?? '—'} accent={layer.accent} />
                     <StatItem icon={CalendarDays} label={L.asOf} value={deep.stats.checkedAt} accent={layer.accent} />
                   </div>
-                  <p className="mt-5 text-xs text-stone-400">{L.sourceOss}</p>
+                  <p className="mt-5 text-xs text-muted-foreground">{L.sourceOss}</p>
                 </div>
               </section>
             )}
@@ -738,14 +743,14 @@ export default function ToolDetail() {
             {/* 常见问题 */}
             <section id="sec-faq" className="mt-14 scroll-mt-24">
               <DeepSectionTitle title={L.faq} accent={layer.accent} />
-              <div className="shadow-warm mt-5 rounded-2xl border border-stone-200/80 bg-[#FFFDF8] px-6">
+              <div className="shadow-warm mt-5 rounded-2xl border border-border/80 bg-paper px-6">
                 <Accordion type="single" collapsible>
                   {detail.faq.map((item, i) => (
                     <AccordionItem key={item.q} value={`faq-${i}`}>
-                      <AccordionTrigger className="text-left text-sm font-semibold text-stone-800">
+                      <AccordionTrigger className="text-left text-sm font-semibold text-foreground">
                         {item.q}
                       </AccordionTrigger>
-                      <AccordionContent className="text-sm leading-7 text-stone-500">
+                      <AccordionContent className="text-sm leading-7 text-muted-foreground">
                         {item.a}
                       </AccordionContent>
                     </AccordionItem>
@@ -759,7 +764,7 @@ export default function ToolDetail() {
               <DeepSectionTitle title={L.resources} accent={layer.accent} />
 
               {/* 官方资源 */}
-              <h3 className="mt-6 flex items-center gap-2 text-sm font-semibold tracking-tight text-stone-700">
+              <h3 className="mt-6 flex items-center gap-2 text-sm font-semibold tracking-tight text-foreground/90">
                 <span
                   aria-hidden
                   className="h-2.5 w-2.5 shrink-0 rounded-[4px]"
@@ -774,12 +779,12 @@ export default function ToolDetail() {
                     href={res.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="shadow-warm group flex items-center justify-between gap-3 rounded-2xl border border-stone-200/80 bg-[#FFFDF8] px-5 py-4 transition-shadow hover:shadow-warm-lg"
+                    className="shadow-warm group flex items-center justify-between gap-3 rounded-2xl border border-border/80 bg-paper px-5 py-4 transition-shadow hover:shadow-warm-lg"
                   >
-                    <span className="text-sm font-medium text-stone-700 transition-colors group-hover:text-stone-900">
+                    <span className="text-sm font-medium text-foreground/90 transition-colors group-hover:text-foreground">
                       {res.label}
                     </span>
-                    <ExternalLink className="h-4 w-4 shrink-0 text-stone-300 transition-colors group-hover:text-stone-500" />
+                    <ExternalLink className="h-4 w-4 shrink-0 text-muted-foreground/50 transition-colors group-hover:text-muted-foreground" />
                   </a>
                 ))}
               </div>
@@ -787,7 +792,7 @@ export default function ToolDetail() {
               {/* 延伸阅读（仅收录了推荐文章时渲染） */}
               {detail.articles && detail.articles.length > 0 && (
                 <>
-                  <h3 className="mt-9 flex items-center gap-2 text-sm font-semibold tracking-tight text-stone-700">
+                  <h3 className="mt-9 flex items-center gap-2 text-sm font-semibold tracking-tight text-foreground/90">
                     <span
                       aria-hidden
                       className="h-2.5 w-2.5 shrink-0 rounded-[4px]"
@@ -799,7 +804,7 @@ export default function ToolDetail() {
                     {detail.articles.map((a) => (
                       <div
                         key={a.url}
-                        className="shadow-warm flex gap-4 rounded-xl border border-stone-200/80 bg-[#FFFDF8] px-5 py-4 transition-shadow hover:shadow-warm-lg"
+                        className="shadow-warm flex gap-4 rounded-xl border border-border/80 bg-paper px-5 py-4 transition-shadow hover:shadow-warm-lg"
                         style={{ '--accent': layer.accent } as CSSProperties}
                       >
                         <span
@@ -814,14 +819,14 @@ export default function ToolDetail() {
                               href={a.url}
                               target="_blank"
                               rel="noreferrer"
-                              className="group inline-flex items-baseline gap-1.5 text-sm font-medium text-stone-800 transition-colors hover:text-[var(--accent)]"
+                              className="group inline-flex items-baseline gap-1.5 text-sm font-medium text-foreground transition-colors hover:text-[var(--accent)]"
                             >
                               <span className="break-words">{a.title}</span>
-                              <ExternalLink className="h-3.5 w-3.5 shrink-0 translate-y-0.5 text-stone-300 transition-colors group-hover:text-[var(--accent)]" />
+                              <ExternalLink className="h-3.5 w-3.5 shrink-0 translate-y-0.5 text-muted-foreground/50 transition-colors group-hover:text-[var(--accent)]" />
                             </a>
-                            <p className="mt-1 text-xs leading-5 text-stone-500">{a.note}</p>
+                            <p className="mt-1 text-xs leading-5 text-muted-foreground">{a.note}</p>
                           </div>
-                          <span className="shrink-0 font-mono text-[11px] text-stone-400">
+                          <span className="shrink-0 font-mono text-[11px] text-muted-foreground">
                             {a.author} · {a.source}
                           </span>
                         </div>
@@ -841,10 +846,10 @@ export default function ToolDetail() {
                     <Link
                       key={s.id}
                       to={`/tool/${s.id}`}
-                      className="rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-white"
+                      className="rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-card"
                       style={{
                         borderColor: `${layer.accent}55`,
-                        backgroundColor: layer.softBg,
+                        backgroundColor: layerSoftBackground(layer.softBg, layer.accent, dark),
                         color: layer.accent,
                       }}
                     >
@@ -865,17 +870,17 @@ export default function ToolDetail() {
         {/* 上一项目 / 下一项目 */}
         <nav
           aria-label="项目间导航"
-          className="mt-14 grid gap-3 border-t border-dashed border-stone-200 pt-8 sm:grid-cols-2"
+          className="mt-14 grid gap-3 border-t border-dashed border-border pt-8 sm:grid-cols-2"
         >
           {prev ? (
             <Link
               to={`/tool/${prev.id}`}
-              className="shadow-warm group flex items-center gap-3 rounded-2xl border border-stone-200/80 bg-[#FFFDF8] px-5 py-4 transition-shadow hover:shadow-warm-lg"
+              className="shadow-warm group flex items-center gap-3 rounded-2xl border border-border/80 bg-paper px-5 py-4 transition-shadow hover:shadow-warm-lg"
             >
-              <ArrowLeft className="h-4 w-4 shrink-0 text-stone-400 transition-transform group-hover:-translate-x-0.5" />
+              <ArrowLeft className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:-translate-x-0.5" />
               <span>
-                <span className="block text-[11px] text-stone-400">{L.prev}</span>
-                <span className="block text-sm font-semibold text-stone-700">{prev.name}</span>
+                <span className="block text-[11px] text-muted-foreground">{L.prev}</span>
+                <span className="block text-sm font-semibold text-foreground/90">{prev.name}</span>
               </span>
             </Link>
           ) : (
@@ -884,13 +889,13 @@ export default function ToolDetail() {
           {next && (
             <Link
               to={`/tool/${next.id}`}
-              className="shadow-warm group flex items-center justify-end gap-3 rounded-2xl border border-stone-200/80 bg-[#FFFDF8] px-5 py-4 text-right transition-shadow hover:shadow-warm-lg"
+              className="shadow-warm group flex items-center justify-end gap-3 rounded-2xl border border-border/80 bg-paper px-5 py-4 text-right transition-shadow hover:shadow-warm-lg"
             >
               <span>
-                <span className="block text-[11px] text-stone-400">{L.next}</span>
-                <span className="block text-sm font-semibold text-stone-700">{next.name}</span>
+                <span className="block text-[11px] text-muted-foreground">{L.next}</span>
+                <span className="block text-sm font-semibold text-foreground/90">{next.name}</span>
               </span>
-              <ArrowRight className="h-4 w-4 shrink-0 text-stone-400 transition-transform group-hover:translate-x-0.5" />
+              <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
             </Link>
           )}
         </nav>

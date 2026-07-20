@@ -11,9 +11,32 @@ import { SectionShell } from '@/components/stack/SectionShell'
 import { LayerHeader } from '@/components/stack/LayerHeader'
 import { ToolCard } from '@/components/stack/ToolCard'
 import { cn } from '@/lib/utils'
+import { useLayerSoftBackground } from '@/lib/layer-surface'
+import type { ReactNode } from 'react'
 
 const layer = layerById('observability')
 const tools = toolsByLayer('observability')
+
+function SoftAccentIcon({
+  children,
+  className,
+}: {
+  children: ReactNode
+  className?: string
+}) {
+  const soft = useLayerSoftBackground(layer.softBg, layer.accent)
+  return (
+    <span
+      className={cn(
+        'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl',
+        className,
+      )}
+      style={{ backgroundColor: soft, color: layer.accent }}
+    >
+      {children}
+    </span>
+  )
+}
 
 /* ------------------------------------------------------------------ */
 /* Trace 瀑布示例数据：一次 Agent 调用的 Span 树                        */
@@ -74,7 +97,7 @@ const DIVISION = [
 /** 小标题：强调色小方块 + 文字 */
 function SubHeading({ children }: { children: string }) {
   return (
-    <h4 className="flex items-center gap-2 text-sm font-bold tracking-wide text-stone-700">
+    <h4 className="flex items-center gap-2 text-sm font-bold tracking-wide text-foreground/90">
       <span className="h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: layer.accent }} />
       {children}
     </h4>
@@ -97,12 +120,12 @@ function TraceBar({ row }: { row: TraceRow }) {
         )}
       >
         {row.depth === 1 && (
-          <CornerDownRight className="h-3 w-3 shrink-0 text-stone-300" aria-hidden />
+          <CornerDownRight className="h-3 w-3 shrink-0 text-muted-foreground/50" aria-hidden />
         )}
         <span
           className={cn(
             'truncate font-mono text-xs',
-            isRoot ? 'font-bold text-stone-800' : 'text-stone-600',
+            isRoot ? 'font-bold text-foreground' : 'text-ink-soft',
           )}
           title={row.name}
         >
@@ -111,7 +134,7 @@ function TraceBar({ row }: { row: TraceRow }) {
       </div>
 
       {/* 瀑布轨道 + 横条 */}
-      <div className="relative h-5 min-w-0 flex-1 rounded-full bg-stone-100/90">
+      <div className="relative h-5 min-w-0 flex-1 rounded-full bg-muted/90">
         {row.ms !== undefined ? (
           <>
             <div
@@ -130,7 +153,7 @@ function TraceBar({ row }: { row: TraceRow }) {
             </div>
             {!isRoot && (
               <span
-                className="absolute top-1/2 -translate-y-1/2 pl-2 font-mono text-[11px] text-stone-500"
+                className="absolute top-1/2 -translate-y-1/2 pl-2 font-mono text-[11px] text-muted-foreground"
                 style={{ left: `${leftPct + widthPct}%` }}
               >
                 {row.ms} ms
@@ -138,7 +161,7 @@ function TraceBar({ row }: { row: TraceRow }) {
             )}
           </>
         ) : (
-          <span className="absolute inset-y-0 left-0 flex items-center gap-1.5 pl-1 text-[11px] text-stone-500">
+          <span className="absolute inset-y-0 left-0 flex items-center gap-1.5 pl-1 text-[11px] text-muted-foreground">
             <CircleCheck className="h-3.5 w-3.5" style={{ color: layer.accent }} aria-hidden />
             生成最终回答，Trace 结束
           </span>
@@ -155,19 +178,16 @@ export default function ObservabilitySection() {
       <LayerHeader layer={layer} index={3} />
 
       {/* ② Trace 瀑布迷你可视化 */}
-      <div className="shadow-warm rounded-2xl border border-stone-200/80 bg-[#FFFDF8] p-6 sm:p-7">
+      <div className="shadow-warm rounded-2xl border border-border/80 bg-paper p-6 sm:p-7">
         <div className="flex items-center gap-3">
-          <span
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
-            style={{ backgroundColor: layer.softBg, color: layer.accent }}
-          >
+          <SoftAccentIcon>
             <ListTree className="h-4 w-4" />
-          </span>
+          </SoftAccentIcon>
           <div>
-            <h4 className="text-base font-bold tracking-tight text-stone-800 sm:text-lg">
+            <h4 className="text-base font-bold tracking-tight text-foreground sm:text-lg">
               一次 Agent 调用的 Trace 瀑布
             </h4>
-            <p className="mt-0.5 text-xs text-stone-500">
+            <p className="mt-0.5 text-xs text-muted-foreground">
               这就是 Phoenix / LangSmith 中看到的 Trace 视图。
             </p>
           </div>
@@ -179,16 +199,16 @@ export default function ObservabilitySection() {
           ))}
         </div>
 
-        <div className="mt-5 flex flex-wrap gap-x-5 gap-y-1.5 border-t border-dashed border-stone-200 pt-4 text-[11px] text-stone-500">
+        <div className="mt-5 flex flex-wrap gap-x-5 gap-y-1.5 border-t border-dashed border-border pt-4 text-[11px] text-muted-foreground">
           <span>
-            总耗时 <span className="font-mono font-semibold text-stone-700">4200 ms</span>
+            总耗时 <span className="font-mono font-semibold text-foreground/90">4200 ms</span>
           </span>
           <span>
-            共 <span className="font-mono font-semibold text-stone-700">5</span> 个 Span
+            共 <span className="font-mono font-semibold text-foreground/90">5</span> 个 Span
           </span>
           <span>
             子步骤合计 3850 ms，其余{' '}
-            <span className="font-mono font-semibold text-stone-700">350 ms</span> 为编排开销
+            <span className="font-mono font-semibold text-foreground/90">350 ms</span> 为编排开销
           </span>
         </div>
       </div>
@@ -216,27 +236,24 @@ export default function ObservabilitySection() {
           {DIVISION.map((item) => (
             <div
               key={item.name}
-              className="shadow-warm rounded-2xl border border-stone-200/80 bg-[#FFFDF8] p-5"
+              className="shadow-warm rounded-2xl border border-border/80 bg-paper p-5"
             >
               <div className="flex items-center gap-2.5">
-                <span
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
-                  style={{ backgroundColor: layer.softBg, color: layer.accent }}
-                >
+                <SoftAccentIcon>
                   <item.icon className="h-4 w-4" />
-                </span>
+                </SoftAccentIcon>
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-bold text-stone-800">{item.name}</p>
+                  <p className="truncate text-sm font-bold text-foreground">{item.name}</p>
                   <p className="text-xs font-semibold" style={{ color: layer.accent }}>
                     {item.role}
                   </p>
                 </div>
               </div>
-              <p className="mt-3 text-xs leading-6 text-stone-500">{item.desc}</p>
+              <p className="mt-3 text-xs leading-6 text-muted-foreground">{item.desc}</p>
             </div>
           ))}
         </div>
-        <p className="mt-4 text-xs leading-6 text-stone-500">
+        <p className="mt-4 text-xs leading-6 text-muted-foreground">
           一句话分工：OpenTelemetry 负责「怎么记录」，Phoenix 负责「本地怎么调」，LangSmith
           负责「线上怎么管」。
         </p>

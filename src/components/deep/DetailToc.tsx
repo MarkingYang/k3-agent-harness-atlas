@@ -53,11 +53,11 @@ export function DetailToc({ items, accent, title }: DetailTocProps) {
 
   return (
     <nav aria-label={title} className="sticky top-24 w-56">
-      <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-stone-400">
+      <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
         <span aria-hidden className="h-2 w-2 rounded-[3px]" style={{ backgroundColor: accent }} />
         {title}
       </p>
-      <ul className="mt-4 border-l border-stone-200">
+      <ul className="mt-4 border-l border-border">
         {items.map((it) => {
           const active = it.id === activeId
           return (
@@ -66,7 +66,7 @@ export function DetailToc({ items, accent, title }: DetailTocProps) {
                 href={`#${it.id}`}
                 aria-current={active ? 'location' : undefined}
                 className={`-ml-px block border-l-2 px-3 py-1.5 text-[13px] leading-5 transition-colors ${
-                  active ? 'font-semibold' : 'text-stone-500 hover:text-stone-800'
+                  active ? 'font-semibold' : 'text-muted-foreground hover:text-foreground'
                 }`}
                 style={
                   active
@@ -102,7 +102,7 @@ export function DetailTocChips({ items, accent, title }: DetailTocProps) {
               className={`shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors ${
                 active
                   ? 'border-transparent text-white'
-                  : 'border-stone-200 bg-[#FFFDF8] text-stone-500 hover:text-stone-800'
+                  : 'border-border bg-paper text-muted-foreground hover:text-foreground'
               }`}
               style={active ? { backgroundColor: accent } : undefined}
             >

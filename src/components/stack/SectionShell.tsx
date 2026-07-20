@@ -17,7 +17,7 @@ export function SectionShell({
   tinted?: boolean
 }) {
   return (
-    <section id={id} className={cn('scroll-mt-28', tinted && 'bg-[#F4EEE3]/60')}>
+    <section id={id} className={cn('scroll-mt-28', tinted && 'bg-tint')}>
       <div className={cn('mx-auto w-full max-w-6xl px-5 py-16 sm:px-8 sm:py-20', className)}>
         {children}
       </div>

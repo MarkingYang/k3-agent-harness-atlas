@@ -29,12 +29,12 @@ export function PriorityStars({
             key={i}
             className={cn(
               'h-3.5 w-3.5',
-              i <= priority ? 'fill-amber-500 text-amber-500' : 'fill-stone-200 text-stone-200',
+              i <= priority ? 'fill-teal-500 text-teal-500' : 'fill-muted text-muted',
             )}
           />
         ))}
       </span>
-      {showLabel && <span className="text-xs font-medium text-stone-500">{label}</span>}
+      {showLabel && <span className="text-xs font-medium text-muted-foreground">{label}</span>}
     </span>
   )
 }

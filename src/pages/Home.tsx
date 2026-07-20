@@ -26,7 +26,7 @@ export default function Home() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-background font-sans text-stone-800 antialiased">
+    <div className="min-h-screen bg-background font-sans text-foreground antialiased">
       <Navbar />
       {/* 左侧目录 + 主内容列：88rem 总宽 = 目录 14rem + 间距 + 主列（各 section 仍按 max-w-6xl 居中，阅读节奏不变） */}
       <div className="mx-auto flex w-full max-w-[88rem] items-start gap-6">

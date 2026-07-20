@@ -48,6 +48,16 @@ module.exports = {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        paper: {
+          DEFAULT: "hsl(var(--paper))",
+          2: "hsl(var(--paper-2))",
+        },
+        tint: "hsl(var(--tint))",
+        ink: {
+          DEFAULT: "hsl(var(--ink))",
+          soft: "hsl(var(--ink-soft))",
+        },
+        glow: "hsl(var(--glow))",
       },
       borderRadius: {
         xl: "calc(var(--radius) + 4px)",

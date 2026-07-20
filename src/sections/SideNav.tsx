@@ -59,7 +59,7 @@ export default function SideNav() {
   return (
     <aside className="hidden w-56 shrink-0 self-stretch lg:block" aria-label={u.toc}>
       <div className="sticky top-28 max-h-[calc(100vh-8.5rem)] overflow-y-auto pb-4 pl-5 sm:pl-8">
-        <p className="px-3 pb-2 text-xs font-medium tracking-wider text-stone-400">{u.toc}</p>
+        <p className="px-3 pb-2 text-xs font-medium tracking-wider text-muted-foreground">{u.toc}</p>
         <nav className="flex flex-col gap-0.5" aria-label={u.toc}>
           {NAV_ITEMS.map((item) => {
             const active = item.id === activeId
@@ -72,8 +72,8 @@ export default function SideNav() {
                 className={cn(
                   'relative flex items-center rounded-lg py-2 pl-4 pr-3 text-sm transition-colors',
                   active
-                    ? 'bg-[#F5EFE3] font-medium text-stone-900'
-                    : 'text-stone-600 hover:bg-[#F8F3E9] hover:text-stone-900',
+                    ? 'bg-paper-2 font-medium text-foreground'
+                    : 'text-ink-soft hover:bg-muted hover:text-foreground',
                 )}
               >
                 {active && (

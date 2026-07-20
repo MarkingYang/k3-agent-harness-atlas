@@ -4,6 +4,7 @@ import { LAYERS, toolsByLayer, layerById, type StackLayer } from '@/data/stack'
 import { SectionShell } from '@/components/stack/SectionShell'
 import { useLanguage } from '@/hooks/use-language'
 import { UI, localizedLayer } from '@/i18n/ui'
+import { useLayerSoftBackground } from '@/lib/layer-surface'
 
 interface MapGroup {
   labelKey: 'groupProduct' | 'groupOrchestration' | 'groupCapability' | 'groupFoundation'
@@ -50,13 +51,14 @@ function LayerBlock({ layer, index }: { layer: StackLayer; index: number }) {
   const { lang } = useLanguage()
   const u = UI[lang]
   const loc = localizedLayer(layer, lang)
+  const soft = useLayerSoftBackground(layer.softBg, layer.accent)
   const tools = toolsByLayer(layer.id)
   const href = ANCHOR_BY_LAYER[layer.id] ?? '#map'
   return (
     <a
       href={href}
       className="group relative block overflow-hidden rounded-2xl border border-transparent shadow-warm transition-all duration-200 hover:-translate-y-0.5 hover:scale-[1.01] hover:shadow-warm-lg"
-      style={{ backgroundColor: layer.softBg }}
+      style={{ backgroundColor: soft }}
       aria-label={`${loc.title}, ${u.mapClick}`}
     >
       <div className="absolute inset-y-0 left-0 w-1.5" style={{ backgroundColor: layer.accent }} />
@@ -74,13 +76,13 @@ function LayerBlock({ layer, index }: { layer: StackLayer; index: number }) {
           </span>
           <div className="min-w-0">
             <div className="flex flex-wrap items-baseline gap-x-2.5">
-              <h3 className="text-lg font-bold tracking-tight text-stone-800 sm:text-xl">
+              <h3 className="text-lg font-bold tracking-tight text-foreground sm:text-xl">
                 {loc.title}
               </h3>
-              <span className="font-mono text-xs text-stone-500">{loc.subtitle}</span>
+              <span className="font-mono text-xs text-muted-foreground">{loc.subtitle}</span>
             </div>
             <span
-              className="mt-1.5 inline-block rounded-full bg-white/70 px-2.5 py-0.5 text-[11px] font-medium"
+              className="mt-1.5 inline-block rounded-full bg-card/70 px-2.5 py-0.5 text-[11px] font-medium"
               style={{ color: layer.accent }}
             >
               {loc.tagline}
@@ -95,10 +97,10 @@ function LayerBlock({ layer, index }: { layer: StackLayer; index: number }) {
                 key={t.id}
                 to={`/tool/${t.id}`}
                 onClick={(e) => e.stopPropagation()}
-                className="inline-flex items-center gap-1.5 rounded-md border border-stone-200/80 bg-[#FFFDF8] px-2.5 py-1 text-xs font-medium text-stone-700 transition-colors hover:border-stone-300 hover:bg-white"
+                className="inline-flex items-center gap-1.5 rounded-md border border-border/80 bg-paper px-2.5 py-1 text-xs font-medium text-foreground/90 transition-colors hover:border-border hover:bg-card"
               >
                 {t.name}
-                <span className="font-mono text-[10px] font-semibold text-amber-600">
+                <span className="font-mono text-[10px] font-semibold text-teal-600">
                   ★{t.priority}
                 </span>
               </Link>
@@ -124,11 +126,11 @@ export default function StackMap() {
   return (
     <SectionShell id="map" tinted>
       <header className="mb-12 max-w-3xl">
-        <p className="font-mono text-xs uppercase tracking-widest text-stone-400">Stack Map</p>
-        <h2 className="mt-2 text-3xl font-bold tracking-tight text-stone-800 sm:text-4xl">
+        <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Stack Map</p>
+        <h2 className="mt-2 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
           {u.mapTitle}
         </h2>
-        <p className="mt-4 text-sm leading-7 text-stone-500 sm:text-base sm:leading-8">
+        <p className="mt-4 text-sm leading-7 text-muted-foreground sm:text-base sm:leading-8">
           {u.mapBody}
         </p>
       </header>
@@ -138,15 +140,15 @@ export default function StackMap() {
           <div key={group.labelKey}>
             {gi > 0 && (
               <div className="flex justify-center py-3" aria-hidden>
-                <ArrowDown className="h-5 w-5 text-stone-300" />
+                <ArrowDown className="h-5 w-5 text-muted-foreground/50" />
               </div>
             )}
             <div className="flex gap-4 sm:gap-6">
               <div className="flex w-9 shrink-0 flex-col items-center gap-2 pt-1 sm:w-12">
-                <span className="text-xs font-semibold tracking-widest text-stone-400 [writing-mode:vertical-rl] sm:text-sm">
+                <span className="text-xs font-semibold tracking-widest text-muted-foreground [writing-mode:vertical-rl] sm:text-sm">
                   {u[group.labelKey]}
                 </span>
-                <span className="hidden text-[10px] leading-4 text-stone-400/80 [writing-mode:vertical-rl] lg:inline">
+                <span className="hidden text-[10px] leading-4 text-muted-foreground/80 [writing-mode:vertical-rl] lg:inline">
                   {u[group.hintKey]}
                 </span>
               </div>
@@ -162,9 +164,9 @@ export default function StackMap() {
         ))}
       </div>
 
-      <div className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 rounded-2xl border border-dashed border-stone-200 bg-[#FFFDF8] px-5 py-3.5 text-xs text-stone-500">
+      <div className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 rounded-2xl border border-dashed border-border bg-paper px-5 py-3.5 text-xs text-muted-foreground">
         <span className="inline-flex items-center gap-1.5">
-          <span className="font-mono font-semibold text-amber-600">★</span>
+          <span className="font-mono font-semibold text-teal-600">★</span>
           {u.mapLegendStars}
         </span>
         <span className="inline-flex items-center gap-1.5">

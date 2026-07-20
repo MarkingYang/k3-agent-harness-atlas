@@ -18,6 +18,8 @@ import { layerById, toolsByLayer } from '@/data/stack'
 import { SectionShell } from '@/components/stack/SectionShell'
 import { LayerHeader } from '@/components/stack/LayerHeader'
 import { ToolCard } from '@/components/stack/ToolCard'
+import { layerSoftBackground, useLayerSoftBackground } from '@/lib/layer-surface'
+import { useTheme } from '@/hooks/use-theme'
 
 /* ------------------------------------------------------------------ */
 /* 流程图示通用零件（本分区内部使用）                                    */
@@ -42,19 +44,20 @@ function StepNode({
   softBg: string
 }) {
   const Icon = step.icon
+  const soft = useLayerSoftBackground(softBg, accent)
   return (
-    <div className="w-full rounded-xl border border-stone-200/70 bg-white/80 px-4 py-4 text-center sm:w-44">
+    <div className="w-full rounded-xl border border-border/70 bg-card/80 px-4 py-4 text-center sm:w-44">
       <span
         className="mx-auto flex h-10 w-10 items-center justify-center rounded-lg"
-        style={{ backgroundColor: softBg, color: accent }}
+        style={{ backgroundColor: soft, color: accent }}
       >
         <Icon className="h-5 w-5" />
       </span>
-      <p className="mt-2.5 font-mono text-[10px] uppercase tracking-widest text-stone-400">
+      <p className="mt-2.5 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
         Step {index}
       </p>
-      <p className="mt-0.5 text-sm font-semibold text-stone-800">{step.name}</p>
-      <p className="mt-1 text-xs leading-5 text-stone-500">{step.desc}</p>
+      <p className="mt-0.5 text-sm font-semibold text-foreground">{step.name}</p>
+      <p className="mt-1 text-xs leading-5 text-muted-foreground">{step.desc}</p>
     </div>
   )
 }
@@ -63,7 +66,7 @@ function StepNode({
 function FlowArrow() {
   return (
     <div className="flex w-full justify-center sm:w-auto" aria-hidden="true">
-      <MoveRight className="h-5 w-5 rotate-90 text-stone-300 sm:rotate-0" />
+      <MoveRight className="h-5 w-5 rotate-90 text-muted-foreground/50 sm:rotate-0" />
     </div>
   )
 }
@@ -83,13 +86,13 @@ function FlowCard({
   children: ReactNode
 }) {
   return (
-    <figure className="shadow-warm rounded-2xl border border-stone-200/80 bg-[#FFFDF8] p-6 sm:p-8">
+    <figure className="shadow-warm rounded-2xl border border-border/80 bg-paper p-6 sm:p-8">
       <figcaption>
-        <p className="flex items-center gap-2 text-base font-bold text-stone-800">
+        <p className="flex items-center gap-2 text-base font-bold text-foreground">
           <Icon className="h-5 w-5" style={{ color: accent }} />
           {title}
         </p>
-        <p className="mt-1.5 max-w-3xl text-xs leading-6 text-stone-500">{caption}</p>
+        <p className="mt-1.5 max-w-3xl text-xs leading-6 text-muted-foreground">{caption}</p>
       </figcaption>
       <div className="mt-6 flex flex-wrap items-center justify-center gap-3">{children}</div>
     </figure>
@@ -129,15 +132,19 @@ const GATE_COLORS = {
 
 /** 第 4 步：发布决策分支节点（通过 / 阻断 两色分支） */
 function GateBranchNode() {
+  const { resolved } = useTheme()
+  const dark = resolved === 'dark'
+  const passBg = layerSoftBackground(GATE_COLORS.pass.softBg, GATE_COLORS.pass.accent, dark)
+  const blockBg = layerSoftBackground(GATE_COLORS.block.softBg, GATE_COLORS.block.accent, dark)
   return (
-    <div className="w-full rounded-xl border border-stone-200/70 bg-white/80 px-4 py-4 sm:w-60">
-      <p className="text-center font-mono text-[10px] uppercase tracking-widest text-stone-400">
+    <div className="w-full rounded-xl border border-border/70 bg-card/80 px-4 py-4 sm:w-60">
+      <p className="text-center font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
         Step 4 · 发布决策
       </p>
       <div className="mt-2.5 space-y-2">
         <div
           className="flex items-center gap-2.5 rounded-lg px-3 py-2"
-          style={{ backgroundColor: GATE_COLORS.pass.softBg }}
+          style={{ backgroundColor: passBg }}
         >
           <CircleCheckBig
             className="h-5 w-5 shrink-0"
@@ -147,19 +154,19 @@ function GateBranchNode() {
             <p className="text-xs font-semibold" style={{ color: GATE_COLORS.pass.accent }}>
               全部达标 → 发布
             </p>
-            <p className="text-[11px] leading-4 text-stone-500">变更合入，新版本上线</p>
+            <p className="text-[11px] leading-4 text-muted-foreground">变更合入，新版本上线</p>
           </div>
         </div>
         <div
           className="flex items-center gap-2.5 rounded-lg px-3 py-2"
-          style={{ backgroundColor: GATE_COLORS.block.softBg }}
+          style={{ backgroundColor: blockBg }}
         >
           <CircleX className="h-5 w-5 shrink-0" style={{ color: GATE_COLORS.block.accent }} />
           <div>
             <p className="text-xs font-semibold" style={{ color: GATE_COLORS.block.accent }}>
               指标回退 → 阻断
             </p>
-            <p className="text-[11px] leading-4 text-stone-500">拦截发布，修复后重新评测</p>
+            <p className="mt-0 text-[11px] leading-4 text-muted-foreground">拦截发布，修复后重新评测</p>
           </div>
         </div>
       </div>

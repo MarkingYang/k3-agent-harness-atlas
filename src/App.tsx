@@ -7,8 +7,8 @@ const ToolDetail = lazy(() => import('./pages/ToolDetail'))
 function DetailFallback() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="flex flex-col items-center gap-3 text-stone-400">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-stone-300 border-t-primary" />
+      <div className="flex flex-col items-center gap-3 text-muted-foreground">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-border border-t-primary" />
         <p className="text-sm">加载项目详情…</p>
       </div>
     </div>

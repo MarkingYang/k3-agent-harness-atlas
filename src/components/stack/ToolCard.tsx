@@ -6,6 +6,7 @@ import { PriorityStars } from './PriorityStars'
 import { ArrowRight, Github, Boxes } from 'lucide-react'
 import { useLanguage } from '@/hooks/use-language'
 import { UI } from '@/i18n/ui'
+import { useLayerSoftBackground } from '@/lib/layer-surface'
 
 /**
  * 工具讲解卡片 —— 各层级分区的标准展示单元
@@ -18,18 +19,19 @@ export function ToolCard({ tool }: { tool: StackTool }) {
     lang === 'en' && deep?.en.summary ? deep.en.summary : tool.summary
   const roleLine =
     lang === 'en' && deep?.en.tagline ? deep.en.tagline : tool.coreRole
+  const soft = useLayerSoftBackground(layer.softBg, layer.accent)
 
   return (
     <article
       id={`tool-${tool.id}`}
-      className="shadow-warm relative overflow-hidden rounded-2xl border border-stone-200/80 bg-[#FFFDF8] transition-shadow hover:shadow-warm-lg"
+      className="shadow-warm relative overflow-hidden rounded-2xl border border-border/80 bg-paper transition-shadow hover:shadow-warm-lg"
     >
       <div className="absolute inset-y-0 left-0 w-1.5" style={{ backgroundColor: layer.accent }} />
       <div className="p-6 pl-7 sm:p-7 sm:pl-8">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h4 className="text-xl font-bold tracking-tight text-stone-800">{tool.name}</h4>
-            <p className="mt-1 inline-flex items-center gap-1.5 font-mono text-xs text-stone-500">
+            <h4 className="text-xl font-bold tracking-tight text-foreground">{tool.name}</h4>
+            <p className="mt-1 inline-flex items-center gap-1.5 font-mono text-xs text-muted-foreground">
               <Github className="h-3.5 w-3.5" />
               {tool.repo}
             </p>
@@ -40,21 +42,21 @@ export function ToolCard({ tool }: { tool: StackTool }) {
         <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
           <span
             className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-medium"
-            style={{ backgroundColor: layer.softBg, color: layer.accent }}
+            style={{ backgroundColor: soft, color: layer.accent }}
           >
             <Boxes className="h-3.5 w-3.5" />
             {tool.harnessModule}
           </span>
-          <span className="text-stone-500">{roleLine}</span>
+          <span className="text-muted-foreground">{roleLine}</span>
         </div>
 
-        <p className="mt-4 text-sm leading-7 text-stone-600">{summary}</p>
+        <p className="mt-4 text-sm leading-7 text-ink-soft">{summary}</p>
 
         <div className="mt-4 flex flex-wrap gap-1.5">
           {tool.focusPoints.map((fp) => (
             <span
               key={fp}
-              className="rounded-md border border-stone-200 bg-stone-50 px-2 py-0.5 font-mono text-[11px] text-stone-600"
+              className="rounded-md border border-border bg-muted/50 px-2 py-0.5 font-mono text-[11px] text-ink-soft"
             >
               {fp}
             </span>
@@ -62,13 +64,13 @@ export function ToolCard({ tool }: { tool: StackTool }) {
         </div>
 
         {lang === 'zh' && (
-          <dl className="mt-5 space-y-2.5 border-t border-dashed border-stone-200 pt-4">
+          <dl className="mt-5 space-y-2.5 border-t border-dashed border-border pt-4">
             {tool.concepts.map((c) => (
               <div key={c.term} className="grid gap-0.5 sm:grid-cols-[180px_1fr] sm:gap-3">
                 <dt className="text-xs font-semibold" style={{ color: layer.accent }}>
                   {c.term}
                 </dt>
-                <dd className="text-xs leading-6 text-stone-500">{c.desc}</dd>
+                <dd className="text-xs leading-6 text-muted-foreground">{c.desc}</dd>
               </div>
             ))}
           </dl>
@@ -77,7 +79,7 @@ export function ToolCard({ tool }: { tool: StackTool }) {
 
       <Link
         to={`/tool/${tool.id}`}
-        className="group flex items-center justify-between gap-2 border-t border-dashed border-stone-200 px-6 py-4 pl-7 text-sm font-semibold transition-colors sm:px-7 sm:pl-8"
+        className="group flex items-center justify-between gap-2 border-t border-dashed border-border px-6 py-4 pl-7 text-sm font-semibold transition-colors sm:px-7 sm:pl-8"
         style={{ color: layer.accent }}
       >
         <span>{UI[lang].viewDetail(tool.name)}</span>
