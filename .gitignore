@@ -1,0 +1,54 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependencies & build
+node_modules
+dist
+dist-ssr
+*.local
+*.tsbuildinfo
+
+# Vite / test cache
+.vite
+coverage
+*.lcov
+
+# Env & secrets（本项目无后端，但仍统一忽略，防止误提交）
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+credentials.json
+secrets/
+
+# Editor / OS
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Local tools / vault
+.obsidian
+
+# 外部仓库文件清单快照（调研用，非运行时依赖）
+jsfiles.json
+
+# Kimi 脚手架生成说明，非项目文档
+template-info.md
+
+# 内部并行开发执行计划，非用户文档
+plan.md
