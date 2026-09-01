@@ -3,7 +3,7 @@ import react from "@vitejs/plugin-react"
 import { defineConfig } from "vite"
 import { inspectAttr } from 'kimi-plugin-inspect-react'
 
-// 自定义域名根路径部署：https://www.ainoteatlas.com/
+// 自定义域名根路径部署：https://aialtas.site/
 export default defineConfig({
   base: '/',
   plugins: [inspectAttr(), react()],
