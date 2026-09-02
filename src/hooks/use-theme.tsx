@@ -40,24 +40,6 @@ function applyDomTheme(resolved: 'light' | 'dark') {
   root.classList.toggle('dark', resolved === 'dark')
   root.style.colorScheme = resolved
 }
-  const root = document.documentElement
-  root.classList.toggle('dark', resolved === 'dark')
-  root.style.colorScheme = resolved
-
-  // favicon 跟随站点外观（不仅跟随系统 prefers-color-scheme）
-  const href = resolved === 'dark' ? '/favicon-dark.svg' : '/favicon.svg'
-  const bust = `${href}?v=atlas-eye`
-  for (const rel of ['icon', 'apple-touch-icon'] as const) {
-    let link = document.querySelector<HTMLLinkElement>(`link[rel="${rel}"]`)
-    if (!link) {
-      link = document.createElement('link')
-      link.rel = rel
-      document.head.appendChild(link)
-    }
-    if (rel === 'icon') link.type = 'image/svg+xml'
-    if (link.getAttribute('href') !== bust) link.setAttribute('href', bust)
-  }
-}
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [appearance, setAppearanceState] = useState<Appearance>(() => {
