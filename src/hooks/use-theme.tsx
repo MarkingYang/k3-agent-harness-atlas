@@ -39,6 +39,10 @@ function applyDomTheme(resolved: 'light' | 'dark') {
   const root = document.documentElement
   root.classList.toggle('dark', resolved === 'dark')
   root.style.colorScheme = resolved
+}
+  const root = document.documentElement
+  root.classList.toggle('dark', resolved === 'dark')
+  root.style.colorScheme = resolved
 
   // favicon 跟随站点外观（不仅跟随系统 prefers-color-scheme）
   const href = resolved === 'dark' ? '/favicon-dark.svg' : '/favicon.svg'
